@@ -7,6 +7,7 @@ from ..database import create_connection
 from ..repositories.user_repository import (
     email_exists,
     find_user_by_email,
+    find_user_by_id,
     insert_user,
     username_exists,
 )
@@ -124,6 +125,26 @@ def authenticate_user(payload):
 
     if not check_password_hash(stored_user["PasswordHash"], login_request.password):
         raise AuthenticationError("Invalid email or password.")
+
+    return AuthenticatedUser(
+        user_id=stored_user["UserID"],
+        username=stored_user["Username"],
+        email=stored_user["Email"],
+        rashi_id=stored_user["RashiID"],
+        nakshatra_id=stored_user["NakshatraID"],
+    )
+
+
+def get_authenticated_user_by_id(user_id):
+    if not user_id:
+        raise AuthenticationError("Authentication required.")
+
+    with create_connection() as connection:
+        with connection.cursor(dictionary=True) as cursor:
+            stored_user = find_user_by_id(cursor, user_id)
+
+    if stored_user is None:
+        raise AuthenticationError("Authentication required.")
 
     return AuthenticatedUser(
         user_id=stored_user["UserID"],

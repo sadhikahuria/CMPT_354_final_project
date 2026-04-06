@@ -8,13 +8,13 @@ class AppIntegrationTestCase(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.app = create_app()
-        cls.client = cls.app.test_client()
         cls.database_settings = cls.app.extensions["database_settings"]
 
     def setUp(self):
         super().setUp()
         self.app_context = self.app.app_context()
         self.app_context.push()
+        self.client = self.app.test_client()
 
     def tearDown(self):
         self.app_context.pop()

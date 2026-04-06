@@ -10,6 +10,7 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=ashtakoota_db
+APP_SECRET_KEY=change-this-for-your-team
 ```
 
 The app still accepts the older combined `DB_HOST` style as a fallback, but the standard format above is what the group should use going forward.
@@ -50,6 +51,13 @@ Current login endpoint:
 POST /auth/login
 ```
 
+Current session endpoints:
+
+```text
+GET /auth/me
+POST /auth/logout
+```
+
 Temporary Phase 2 request body:
 
 ```json
@@ -77,3 +85,5 @@ Current login request body:
 ```
 
 For this step, login only verifies credentials and returns a user summary. Session or token management will be added later.
+
+This step now uses Flask's signed cookie session. Set `APP_SECRET_KEY` in `.env` so the whole team can run the same auth flow reliably on their own machines.

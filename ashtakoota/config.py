@@ -24,6 +24,12 @@ class DatabaseSettings:
         return None
 
 
+@dataclass(frozen=True)
+class AppSecuritySettings:
+    secret_key: str
+    uses_default_secret_key: bool
+
+
 def load_database_settings():
     load_dotenv()
 
@@ -39,6 +45,22 @@ def load_database_settings():
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
         uses_legacy_host_format=uses_legacy_host_format,
+    )
+
+
+def load_app_security_settings():
+    load_dotenv()
+
+    secret_key = (os.getenv("APP_SECRET_KEY") or "").strip()
+    if secret_key:
+        return AppSecuritySettings(
+            secret_key=secret_key,
+            uses_default_secret_key=False,
+        )
+
+    return AppSecuritySettings(
+        secret_key="dev-secret-key-change-me",
+        uses_default_secret_key=True,
     )
 
 

@@ -70,6 +70,7 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertEqual(response_payload["status"], "ok")
         self.assertEqual(response_payload["user"]["email"], user["email"])
         self.assertEqual(response_payload["user"]["username"], user["username"])
+        self.assertIn("signed Flask session", response_payload["note"])
 
     def test_login_rejects_wrong_password(self):
         user = self._create_test_user()
@@ -84,6 +85,41 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response_payload["status"], "error")
         self.assertEqual(response_payload["message"], "Invalid email or password.")
+
+    def test_me_requires_login(self):
+        response = self.client.get("/auth/me")
+        response_payload = response.get_json()
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_payload["status"], "error")
+        self.assertEqual(response_payload["message"], "Authentication required.")
+
+    def test_login_sets_session_and_logout_clears_it(self):
+        user = self._create_test_user()
+
+        login_response = self.client.post(
+            "/auth/login",
+            json={
+                "email": user["email"],
+                "password": user["password"],
+            },
+        )
+        self.assertEqual(login_response.status_code, 200)
+
+        me_response = self.client.get("/auth/me")
+        me_payload = me_response.get_json()
+        self.assertEqual(me_response.status_code, 200)
+        self.assertEqual(me_payload["user"]["email"], user["email"])
+
+        logout_response = self.client.post("/auth/logout")
+        logout_payload = logout_response.get_json()
+        self.assertEqual(logout_response.status_code, 200)
+        self.assertEqual(logout_payload["message"], "Logged out successfully.")
+
+        me_after_logout_response = self.client.get("/auth/me")
+        me_after_logout_payload = me_after_logout_response.get_json()
+        self.assertEqual(me_after_logout_response.status_code, 401)
+        self.assertEqual(me_after_logout_payload["message"], "Authentication required.")
 
     def _fetch_user_by_email(self, email):
         with create_connection() as connection:

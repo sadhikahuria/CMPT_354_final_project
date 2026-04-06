@@ -33,6 +33,25 @@ def find_user_by_email(cursor, email):
     return cursor.fetchone()
 
 
+def find_user_by_id(cursor, user_id):
+    cursor.execute(
+        """
+        SELECT
+            UserID,
+            Username,
+            Email,
+            PasswordHash,
+            RashiID,
+            NakshatraID
+        FROM USER
+        WHERE UserID = %s
+        LIMIT 1
+        """,
+        (user_id,),
+    )
+    return cursor.fetchone()
+
+
 def insert_user(cursor, registration):
     cursor.execute(
         """

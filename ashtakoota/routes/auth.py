@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 
 from ..services.auth_service import (
     AuthenticationError,
@@ -8,6 +8,7 @@ from ..services.auth_service import (
     RegistrationConflictError,
     RegistrationValidationError,
     authenticate_user,
+    get_authenticated_user_by_id,
     register_user,
 )
 
@@ -48,10 +49,38 @@ def login():
     except AuthenticationError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 401
 
+    session["user_id"] = authenticated_user.user_id
+
     return jsonify(
         {
             "status": "ok",
             "user": asdict(authenticated_user),
-            "note": "Session management will be added in a later step.",
+            "note": "A signed Flask session is now active for this client.",
+        }
+    )
+
+
+@auth_blueprint.get("/me")
+def me():
+    try:
+        authenticated_user = get_authenticated_user_by_id(session.get("user_id"))
+    except AuthenticationError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 401
+
+    return jsonify(
+        {
+            "status": "ok",
+            "user": asdict(authenticated_user),
+        }
+    )
+
+
+@auth_blueprint.post("/logout")
+def logout():
+    session.clear()
+    return jsonify(
+        {
+            "status": "ok",
+            "message": "Logged out successfully.",
         }
     )
