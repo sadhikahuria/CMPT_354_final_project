@@ -1,0 +1,132 @@
+{% extends "ui/base.html" %}
+
+{% block title %}Ashtakoota UI{% endblock %}
+
+{% block body %}
+<main class="page-shell">
+    <section class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Phase 2 Visual Slice</p>
+            <h1>Ashtakoota Matchmaking</h1>
+            <p class="hero-text">
+                This is the first browser-facing screen for the project. It sits on top of the
+                API we already built for registration, login, session state, and discovery.
+            </p>
+            <div class="hero-note">
+                <strong>Current dev note:</strong> for now, birth details still require manually
+                selecting the derived Rashi and Nakshatra IDs.
+            </div>
+        </div>
+        <div class="hero-panel">
+            <div class="status-card">
+                <span class="status-label">Session State</span>
+                <p id="auth-state" class="status-value">Checking current session...</p>
+                <p id="status-message" class="status-message">Use the forms below to create an account or sign in.</p>
+                <button id="logout-button" class="secondary-button" type="button" disabled>Log Out</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel-grid">
+        <article class="panel">
+            <div class="panel-heading">
+                <p class="panel-kicker">1</p>
+                <h2>Create Account</h2>
+            </div>
+            <form id="register-form" class="form-grid">
+                <label>
+                    Username
+                    <input name="username" type="text" required>
+                </label>
+                <label>
+                    Email
+                    <input name="email" type="email" required>
+                </label>
+                <label>
+                    Password
+                    <input name="password" type="password" minlength="8" required>
+                </label>
+                <label>
+                    Date of Birth
+                    <input name="date_of_birth" type="date" required>
+                </label>
+                <label>
+                    Time of Birth
+                    <input name="time_of_birth" type="time" required>
+                </label>
+                <label class="full-width">
+                    Birth Location
+                    <input name="birth_location" type="text" placeholder="Surrey, BC" required>
+                </label>
+                <label>
+                    Rashi
+                    <select name="rashi_id" required>
+                        {% for rashi in rashis %}
+                        <option value="{{ rashi.id }}">{{ rashi.id }} - {{ rashi.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    Nakshatra
+                    <select name="nakshatra_id" required>
+                        {% for nakshatra in nakshatras %}
+                        <option value="{{ nakshatra.id }}">{{ nakshatra.id }} - {{ nakshatra.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <div class="full-width action-row">
+                    <button class="primary-button" type="submit">Register</button>
+                </div>
+            </form>
+        </article>
+
+        <article class="panel">
+            <div class="panel-heading">
+                <p class="panel-kicker">2</p>
+                <h2>Sign In</h2>
+            </div>
+            <form id="login-form" class="form-grid compact-form">
+                <label>
+                    Email
+                    <input name="email" type="email" required>
+                </label>
+                <label>
+                    Password
+                    <input name="password" type="password" required>
+                </label>
+                <div class="full-width action-row">
+                    <button class="primary-button" type="submit">Log In</button>
+                </div>
+            </form>
+            <div class="helper-copy">
+                <p>After sign-in, the discovery panel below uses the same signed Flask session as the JSON API.</p>
+            </div>
+        </article>
+    </section>
+
+    <section class="panel discovery-panel">
+        <div class="panel-heading">
+            <p class="panel-kicker">3</p>
+            <h2>Discover Users</h2>
+        </div>
+        <form id="discover-form" class="filter-row">
+            <label>
+                Min Age
+                <input name="min_age" type="number" min="0" placeholder="e.g. 25">
+            </label>
+            <label>
+                Max Age
+                <input name="max_age" type="number" min="0" placeholder="e.g. 30">
+            </label>
+            <button class="primary-button" type="submit">Refresh Matches</button>
+        </form>
+        <p class="helper-copy">
+            This page currently shows a simple discover list. Compatibility previews and richer profile cards will come later.
+        </p>
+        <div id="discover-empty" class="empty-state">
+            Sign in to load discoverable users.
+        </div>
+        <div id="discover-results" class="discover-grid" hidden></div>
+    </section>
+</main>
+{% endblock %}

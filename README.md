@@ -64,6 +64,13 @@ Current discovery endpoint:
 GET /users/discover
 ```
 
+Current browser UI:
+
+```text
+GET /
+GET /ui/
+```
+
 Optional discovery query params:
 
 ```text
@@ -102,3 +109,7 @@ For this step, login only verifies credentials and returns a user summary. Sessi
 This step now uses Flask's signed cookie session. Set `APP_SECRET_KEY` in `.env` so the whole team can run the same auth flow reliably on their own machines.
 
 `GET /users/discover` requires login and returns other users only. It excludes the signed-in user, derives each returned user's age from `DateOfBirth`, and currently supports `min_age` / `max_age` filtering.
+
+`GET /` now redirects to the first visual page. `GET /ui/` also works directly. The page includes a small register form, login/logout controls, and a discovery panel wired to the API endpoints above.
+
+If you want the old JSON-style app summary while developing, use `GET /api`.
