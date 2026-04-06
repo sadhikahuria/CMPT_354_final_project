@@ -74,6 +74,23 @@ async function ensureSafetyTables() {
   );
 }
 
+async function ensureUserPhotoTable() {
+  await db.query(
+    `CREATE TABLE IF NOT EXISTS USER_PHOTO (
+      PhotoID BIGINT NOT NULL AUTO_INCREMENT,
+      UserID INT NOT NULL,
+      PhotoURL VARCHAR(500) NOT NULL,
+      SortOrder INT NOT NULL DEFAULT 0,
+      IsPrimaryPhoto TINYINT(1) NOT NULL DEFAULT 0,
+      CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (PhotoID),
+      KEY idx_user_photo_user (UserID, SortOrder),
+      CONSTRAINT fk_user_photo_user FOREIGN KEY (UserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
+}
+
 async function ensureUserColumns() {
   const columns = [
     ['GenderIdentity', 'VARCHAR(30)'],
@@ -162,7 +179,7 @@ app.use((err, req, res, next) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT || '4000');
-Promise.all([ensureSafetyTables(), ensureUserColumns()])
+Promise.all([ensureSafetyTables(), ensureUserColumns(), ensureUserPhotoTable()])
   .catch(err => {
     console.error('Failed to ensure safety tables:', err.message);
     process.exit(1);

@@ -49,6 +49,16 @@ const upload = multer({
     cb(null, true);
   },
 });
+const MAX_PROFILE_PHOTOS = 6;
+const MIN_PROFILE_PHOTOS = 4;
+
+function cleanupUploadedFiles(files = []) {
+  for (const file of files) {
+    try {
+      if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    } catch {}
+  }
+}
 
 function makeToken(user) {
   return jwt.sign(
@@ -138,7 +148,7 @@ router.post('/register', rateLimit({
   max: 20,
   scope: 'register',
   message: 'Too many registration attempts. Please try again later.',
-}), upload.single('avatar'), async (req, res) => {
+}), upload.array('photos', MAX_PROFILE_PHOTOS), async (req, res) => {
   try {
     const { password, dateOfBirth, timeOfBirth } = req.body;
     const username = normalizeUsername(req.body.username);
@@ -150,33 +160,70 @@ router.post('/register', rateLimit({
     const lookingFor = normalizePlainText(req.body.lookingFor || '', 30).toLowerCase();
     const relationshipIntent = normalizePlainText(req.body.relationshipIntent || '', 30).toLowerCase();
     const safetyConsent = String(req.body.safetyConsent || '').toLowerCase() === 'true';
+    const uploadedPhotos = Array.isArray(req.files) ? req.files : [];
 
     // Basic validation
     if (!username || !email || !password || !dateOfBirth || !timeOfBirth || !birthLocation || !genderIdentity || !lookingFor || !relationshipIntent) {
-      return res.status(400).json({ error: 'All fields are required' });
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Username, email, password, birth details, gender identity, who you want to meet, and relationship intent are required' });
     }
-    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    if (password.length < 8) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
     if (!validateUsername(username)) {
+      cleanupUploadedFiles(uploadedPhotos);
       return res.status(400).json({ error: 'Username must be 2-30 chars and use only letters, numbers, spaces, dots, underscores, or hyphens' });
     }
-    if (!validateEmail(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
-    if (!validateBirthLocation(birthLocation)) return res.status(400).json({ error: 'Birth location is required' });
-    if (!allowedProfileEnums.genderIdentity.has(genderIdentity)) return res.status(400).json({ error: 'Select a valid gender identity' });
-    if (!allowedProfileEnums.lookingFor.has(lookingFor)) return res.status(400).json({ error: 'Select who you want to meet' });
-    if (!allowedProfileEnums.relationshipIntent.has(relationshipIntent)) return res.status(400).json({ error: 'Select your relationship intent' });
-    if (!safetyConsent) return res.status(400).json({ error: 'You must confirm you are 18+ and agree to respectful conduct' });
+    if (!validateEmail(email)) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+    if (!validateBirthLocation(birthLocation)) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Birth location is required' });
+    }
+    if (!allowedProfileEnums.genderIdentity.has(genderIdentity)) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Select a valid gender identity' });
+    }
+    if (!allowedProfileEnums.lookingFor.has(lookingFor)) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Select who you want to meet' });
+    }
+    if (!allowedProfileEnums.relationshipIntent.has(relationshipIntent)) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Select your relationship intent' });
+    }
+    if (!safetyConsent) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'You must confirm you are 18+ and agree to respectful conduct' });
+    }
+    if (uploadedPhotos.length < MIN_PROFILE_PHOTOS) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: `Add at least ${MIN_PROFILE_PHOTOS} profile photos` });
+    }
 
     const age = ageFromDate(dateOfBirth);
-    if (!age || age < 18) return res.status(400).json({ error: 'You must be at least 18 years old to join' });
+    if (!age || age < 18) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'You must be at least 18 years old to join' });
+    }
 
     const coords = parseCoords(req.body.latitude, req.body.longitude);
-    if (!coords) return res.status(400).json({ error: 'Please select a valid birth city from the dropdown results' });
+    if (!coords) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(400).json({ error: 'Please select a valid birth city from the dropdown results' });
+    }
 
     // Check uniqueness
     const [existing] = await db.query(
       'SELECT UserID FROM USER WHERE Username = ? OR Email = ?', [username, email]
     );
-    if (existing.length) return res.status(409).json({ error: 'Username or email already taken' });
+    if (existing.length) {
+      cleanupUploadedFiles(uploadedPhotos);
+      return res.status(409).json({ error: 'Username or email already taken' });
+    }
 
     // Derive Moon Rashi + Nakshatra from birth details
     const chart = await getBirthChart(dateOfBirth, timeOfBirth, coords.latitude, coords.longitude);
@@ -186,18 +233,23 @@ router.post('/register', rateLimit({
     const [[nakshatra]] = await db.query('SELECT NakshatraID FROM NAKSHATRA WHERE NakshatraName = ?', [chart.nakshatraName]);
 
     if (!rashi || !nakshatra) {
+      cleanupUploadedFiles(uploadedPhotos);
       return res.status(500).json({ error: `Could not map birth chart: Rashi=${chart.rashiName}, Nakshatra=${chart.nakshatraName}` });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
     let avatarURL = null;
-    if (req.file) {
-      const normalized = await normalizeAvatar(req.file.path);
-      const finalName = `${path.basename(req.file.filename, path.extname(req.file.filename))}${normalized.extension}`;
+    const photoRows = [];
+    for (let i = 0; i < uploadedPhotos.length; i += 1) {
+      const file = uploadedPhotos[i];
+      const normalized = await normalizeAvatar(file.path);
+      const finalName = `${path.basename(file.filename, path.extname(file.filename))}${normalized.extension}`;
       const finalPath = path.join(uploadDir, finalName);
       fs.renameSync(normalized.outputPath, finalPath);
-      fs.unlinkSync(req.file.path);
-      avatarURL = `/uploads/${finalName}`;
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      const photoURL = `/uploads/${finalName}`;
+      if (!avatarURL) avatarURL = photoURL;
+      photoRows.push([photoURL, i, i === 0 ? 1 : 0]);
     }
 
     const [result] = await db.query(
@@ -209,6 +261,14 @@ router.post('/register', rateLimit({
        birthLocation, coords.latitude, coords.longitude, rashi.RashiID, nakshatra.NakshatraID, avatarURL, bio || null,
        genderIdentity, lookingFor, relationshipIntent, profilePrompt || null]
     );
+
+    if (photoRows.length) {
+      await db.query(
+        `INSERT INTO USER_PHOTO (UserID, PhotoURL, SortOrder, IsPrimaryPhoto)
+         VALUES ${photoRows.map(() => '(?, ?, ?, ?)').join(', ')}`,
+        photoRows.flatMap(([photoURL, sortOrder, isPrimary]) => [result.insertId, photoURL, sortOrder, isPrimary])
+      );
+    }
 
     const [[user]] = await db.query(
       `SELECT u.*, r.RashiName, n.NakshatraName, n.Gana, n.Nadi, n.Yoni,
@@ -229,6 +289,7 @@ router.post('/register', rateLimit({
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
     });
   } catch (err) {
+    cleanupUploadedFiles(req.files);
     console.error('Register error:', err);
     return res.status(500).json({ error: err.message });
   }

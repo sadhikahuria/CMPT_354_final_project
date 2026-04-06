@@ -765,9 +765,13 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         <div id="city-confirm" style="display:none;margin-top:6px;font-size:12px;color:var(--accent-teal);">✓ <span id="city-confirm-text"></span></div>
         <p class="form-hint">Select your birth city from the dropdown — coordinates fill automatically.</p>
       </div>
-      <div class="form-group"><label>Profile headline <span style="font-weight:400;text-transform:none;">(optional)</span></label><input type="text" id="reg-prompt" maxlength="160" placeholder="A grounded romantic who values warmth, family, and emotional maturity." /></div>
-      <div class="form-group"><label>Bio <span style="font-weight:400;text-transform:none;">(optional)</span></label><textarea id="reg-bio" rows="2" placeholder="What makes you a good partner? What kind of connection are you hoping to build?" style="resize:vertical;"></textarea></div>
-      <div class="form-group"><label>Profile Photo <span style="font-weight:400;text-transform:none;">(optional)</span></label><input type="file" id="reg-avatar" accept="image/*" /></div>
+      <div class="form-group"><label>Profile headline</label><input type="text" id="reg-prompt" maxlength="160" placeholder="A grounded romantic who values warmth, family, and emotional maturity." /></div>
+      <div class="form-group"><label>Bio</label><textarea id="reg-bio" rows="2" placeholder="What makes you a good partner? What kind of connection are you hoping to build?" style="resize:vertical;"></textarea></div>
+      <div class="form-group">
+        <label>Profile Photos</label>
+        <input type="file" id="reg-photos" accept="image/*" multiple />
+        <p class="form-hint">Add at least 4 photos. Your first photo becomes your main profile image.</p>
+      </div>
       <div class="form-group" style="display:flex;gap:10px;align-items:flex-start;">
         <input type="checkbox" id="reg-safety" style="width:auto;margin-top:4px;" />
         <label for="reg-safety" style="font-size:12px;letter-spacing:0;text-transform:none;line-height:1.5;">I confirm I am 18+ and will treat other members respectfully. Harassment, impersonation, and unsafe conduct can lead to removal.</label>
@@ -1294,6 +1298,7 @@ async function doRegister() {
   const btn = document.getElementById('register-btn');
   const err = document.getElementById('register-error');
   err.classList.remove('show');
+  const photoFiles = Array.from(document.getElementById('reg-photos').files || []);
 
   // Validate city was selected from dropdown
   const lat = document.getElementById('reg-lat').value;
@@ -1302,6 +1307,12 @@ async function doRegister() {
     err.textContent = 'Please select your birth city from the dropdown list so coordinates can be set automatically.';
     err.classList.add('show');
     document.getElementById('reg-location').focus();
+    return;
+  }
+  if (photoFiles.length < 4) {
+    err.textContent = 'Add at least 4 profile photos before creating your profile.';
+    err.classList.add('show');
+    document.getElementById('reg-photos').focus();
     return;
   }
 
@@ -1322,8 +1333,7 @@ async function doRegister() {
     fd.append('bio',           document.getElementById('reg-bio').value);
     fd.append('profilePrompt', document.getElementById('reg-prompt').value);
     fd.append('safetyConsent', document.getElementById('reg-safety').checked ? 'true' : 'false');
-    const avatarFile = document.getElementById('reg-avatar').files[0];
-    if (avatarFile) fd.append('avatar', avatarFile);
+    photoFiles.forEach(file => fd.append('photos', file));
 
     const data = await api('POST', '/api/auth/register', fd, true);
     if (!data) return;
