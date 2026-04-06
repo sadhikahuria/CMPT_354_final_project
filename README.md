@@ -64,6 +64,13 @@ Current discovery endpoint:
 GET /users/discover
 ```
 
+Optional discovery query params:
+
+```text
+min_age
+max_age
+```
+
 Temporary Phase 2 request body:
 
 ```json
@@ -94,4 +101,4 @@ For this step, login only verifies credentials and returns a user summary. Sessi
 
 This step now uses Flask's signed cookie session. Set `APP_SECRET_KEY` in `.env` so the whole team can run the same auth flow reliably on their own machines.
 
-`GET /users/discover` requires login and returns other users only. It excludes the signed-in user and derives each returned user's age from `DateOfBirth`.
+`GET /users/discover` requires login and returns other users only. It excludes the signed-in user, derives each returned user's age from `DateOfBirth`, and currently supports `min_age` / `max_age` filtering.

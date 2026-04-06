@@ -57,6 +57,55 @@ class UserRoutesTestCase(AppIntegrationTestCase):
             expected_age(other_user["date_of_birth"]),
         )
 
+    def test_discover_filters_by_age_range(self):
+        current_user = create_test_user(
+            self.client,
+            username="test_filter_current_user",
+            email="test_filter_current_user@example.com",
+            date_of_birth="2001-06-15",
+        )
+        younger_user = create_test_user(
+            self.client,
+            username="test_younger_user",
+            email="test_younger_user@example.com",
+            date_of_birth="2004-01-01",
+        )
+        matching_user = create_test_user(
+            self.client,
+            username="test_matching_user",
+            email="test_matching_user@example.com",
+            date_of_birth="1999-01-01",
+        )
+
+        login_test_user(self.client, current_user)
+
+        response = self.client.get("/users/discover?min_age=25&max_age=28")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(payload["filters"]["min_age"], 25)
+        self.assertEqual(payload["filters"]["max_age"], 28)
+
+        usernames = [user["username"] for user in payload["users"]]
+        self.assertNotIn(younger_user["username"], usernames)
+        self.assertIn(matching_user["username"], usernames)
+
+    def test_discover_rejects_invalid_age_filters(self):
+        current_user = create_test_user(
+            self.client,
+            username="test_invalid_filter_user",
+            email="test_invalid_filter_user@example.com",
+        )
+        login_test_user(self.client, current_user)
+
+        response = self.client.get("/users/discover?min_age=abc")
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(payload["status"], "error")
+        self.assertEqual(payload["message"], "min_age must be a non-negative integer.")
+
 
 if __name__ == "__main__":
     import unittest
