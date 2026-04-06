@@ -1,14 +1,7 @@
-import unittest
-
-from ashtakoota import create_app
+from tests.base import AppIntegrationTestCase
 
 
-class Phase1RoutesTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.app = create_app()
-        cls.client = cls.app.test_client()
-        cls.database_settings = cls.app.extensions["database_settings"]
+class Phase1RoutesTestCase(AppIntegrationTestCase):
 
     def test_home_route(self):
         response = self.client.get("/")
@@ -40,4 +33,6 @@ class Phase1RoutesTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import unittest
+
     unittest.main()
