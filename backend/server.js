@@ -75,20 +75,33 @@ async function ensureSafetyTables() {
 }
 
 async function ensureUserColumns() {
-  const alters = [
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS GenderIdentity VARCHAR(30)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS LookingFor VARCHAR(30)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS RelationshipIntent VARCHAR(30)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS ProfilePrompt VARCHAR(160)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS AcceptedSafetyAt DATETIME',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS EmailVerifiedAt DATETIME',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS EmailVerifyTokenHash VARCHAR(128)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS EmailVerifyExpiresAt DATETIME',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS PasswordResetTokenHash VARCHAR(128)',
-    'ALTER TABLE USER ADD COLUMN IF NOT EXISTS PasswordResetExpiresAt DATETIME',
+  const columns = [
+    ['GenderIdentity', 'VARCHAR(30)'],
+    ['LookingFor', 'VARCHAR(30)'],
+    ['RelationshipIntent', 'VARCHAR(30)'],
+    ['ProfilePrompt', 'VARCHAR(160)'],
+    ['AcceptedSafetyAt', 'DATETIME'],
+    ['EmailVerifiedAt', 'DATETIME'],
+    ['EmailVerifyTokenHash', 'VARCHAR(128)'],
+    ['EmailVerifyExpiresAt', 'DATETIME'],
+    ['PasswordResetTokenHash', 'VARCHAR(128)'],
+    ['PasswordResetExpiresAt', 'DATETIME'],
   ];
-  for (const sql of alters) {
-    await db.query(sql);
+
+  for (const [columnName, definition] of columns) {
+    const [rows] = await db.query(
+      `SELECT 1
+       FROM information_schema.columns
+       WHERE table_schema = DATABASE()
+         AND table_name = 'USER'
+         AND column_name = ?
+       LIMIT 1`,
+      [columnName]
+    );
+
+    if (!rows.length) {
+      await db.query(`ALTER TABLE USER ADD COLUMN ${columnName} ${definition}`);
+    }
   }
 }
 
