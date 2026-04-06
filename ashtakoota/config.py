@@ -12,14 +12,14 @@ class DatabaseSettings:
     user: str | None
     password: str | None
     database: str | None
+    uses_legacy_host_format: bool
 
     @property
     def config_warning(self):
-        normalized_host = f"{self.host}:{self.port}"
-        if self.raw_host not in {self.host, normalized_host}:
+        if self.uses_legacy_host_format:
             return (
-                "DB_HOST was parsed from a combined value. Prefer localhost "
-                "or host:port in .env."
+                "DB_HOST used a legacy combined value. Prefer separate DB_HOST "
+                "and DB_PORT values in .env."
             )
         return None
 
@@ -28,7 +28,8 @@ def load_database_settings():
     load_dotenv()
 
     raw_host = (os.getenv("DB_HOST") or "localhost").strip()
-    host, port = _split_host_and_port(raw_host)
+    host, inferred_port, uses_legacy_host_format = _split_host_and_port(raw_host)
+    port = _read_port(default_port=inferred_port)
 
     return DatabaseSettings(
         raw_host=raw_host,
@@ -37,16 +38,25 @@ def load_database_settings():
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
+        uses_legacy_host_format=uses_legacy_host_format,
     )
 
 
 def _split_host_and_port(raw_host):
+    uses_legacy_host_format = "@" in raw_host
     host_value = raw_host.split("@", 1)[-1]
     port = 3306
 
     if ":" in host_value:
         possible_host, possible_port = host_value.rsplit(":", 1)
         if possible_port.isdigit():
-            return possible_host, int(possible_port)
+            return possible_host, int(possible_port), uses_legacy_host_format
 
-    return host_value, port
+    return host_value, port, uses_legacy_host_format
+
+
+def _read_port(default_port):
+    raw_port = (os.getenv("DB_PORT") or "").strip()
+    if raw_port.isdigit():
+        return int(raw_port)
+    return default_port

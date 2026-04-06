@@ -2,6 +2,7 @@ from flask import Flask
 
 from .config import load_database_settings
 from .database import register_database_settings
+from .routes.auth import auth_blueprint
 from .routes.core import core_blueprint
 from .routes.phase1 import phase1_blueprint
 
@@ -15,5 +16,6 @@ def create_app(database_settings=None):
 
     app.register_blueprint(core_blueprint)
     app.register_blueprint(phase1_blueprint)
+    app.register_blueprint(auth_blueprint)
 
     return app

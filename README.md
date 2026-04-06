@@ -1,1 +1,62 @@
 # CMPT_354_final_project
+
+## Team Setup
+
+Use a local `.env` file with standard database settings:
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=ashtakoota_db
+```
+
+The app still accepts the older combined `DB_HOST` style as a fallback, but the standard format above is what the group should use going forward.
+
+## Run And Verify
+
+PowerShell scripts:
+
+```powershell
+./scripts/setup.ps1
+./scripts/run.ps1
+./scripts/verify.ps1
+```
+
+Make targets:
+
+```powershell
+make setup
+make run
+make verify
+```
+
+`setup` creates `.venv` and installs the Python dependencies from `requirements.txt`.
+
+`verify` runs the integration tests against the configured MySQL database.
+
+## Current API Slice
+
+Current registration endpoint:
+
+```text
+POST /auth/register
+```
+
+Temporary Phase 2 request body:
+
+```json
+{
+  "username": "new_user",
+  "email": "new_user@example.com",
+  "password": "securepass123",
+  "date_of_birth": "2000-01-02",
+  "time_of_birth": "08:30:00",
+  "birth_location": "Surrey, BC",
+  "rashi_id": 1,
+  "nakshatra_id": 1
+}
+```
+
+For this step, `rashi_id` and `nakshatra_id` are accepted directly so we can build and test the auth flow first. We will replace that with birth-data derivation in a later step.

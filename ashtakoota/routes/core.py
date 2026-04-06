@@ -9,7 +9,7 @@ def home():
     return jsonify(
         {
             "message": "Ashtakoota app is running.",
-            "phase": "Phase 1 - database verification",
-            "next_routes": ["/health/db", "/phase1/schema-check"],
+            "phase": "Phase 2 - auth foundation",
+            "next_routes": ["/health/db", "/phase1/schema-check", "/auth/register"],
         }
     )

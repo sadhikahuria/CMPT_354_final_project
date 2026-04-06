@@ -8,8 +8,9 @@ class Phase1RoutesTestCase(AppIntegrationTestCase):
         payload = response.get_json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(payload["phase"], "Phase 1 - database verification")
+        self.assertEqual(payload["phase"], "Phase 2 - auth foundation")
         self.assertIn("/health/db", payload["next_routes"])
+        self.assertIn("/auth/register", payload["next_routes"])
 
     def test_database_health_route(self):
         response = self.client.get("/health/db")
