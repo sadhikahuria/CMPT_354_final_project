@@ -224,6 +224,7 @@ router.post('/register', rateLimit({
     setAuthCookie(res, token);
     await issueVerificationForUser(user.UserID, user.Email, user.Username);
     return res.status(201).json({
+      token,
       user: sanitizeUser(user),
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
     });
@@ -262,7 +263,7 @@ router.post('/login', rateLimit({
 
     const token = makeToken(user);
     setAuthCookie(res, token);
-    return res.json({ user: sanitizeUser(user) });
+    return res.json({ token, user: sanitizeUser(user) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
