@@ -5,6 +5,9 @@
 
 -- Drop in reverse dependency order
 DROP TABLE IF EXISTS NOTIFICATIONS;
+DROP TABLE IF EXISTS USER_REPORT_ACTION;
+DROP TABLE IF EXISTS USER_REPORT;
+DROP TABLE IF EXISTS USER_BLOCK;
 DROP TABLE IF EXISTS MESSAGES;
 DROP TABLE IF EXISTS KOOTA_SCORE;
 DROP TABLE IF EXISTS COMPATIBILITY_EVAL;
@@ -63,12 +66,65 @@ CREATE TABLE USER (
     NakshatraID   INT           NOT NULL,
     AvatarURL     VARCHAR(500),
     Bio           VARCHAR(300),
+    GenderIdentity VARCHAR(30),
+    LookingFor     VARCHAR(30),
+    RelationshipIntent VARCHAR(30),
+    ProfilePrompt  VARCHAR(160),
+    AcceptedSafetyAt DATETIME,
+    EmailVerifiedAt DATETIME,
+    EmailVerifyTokenHash VARCHAR(128),
+    EmailVerifyExpiresAt DATETIME,
+    PasswordResetTokenHash VARCHAR(128),
+    PasswordResetExpiresAt DATETIME,
     CreatedAt     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (UserID),
     CONSTRAINT fk_user_rashi     FOREIGN KEY (RashiID)     REFERENCES RASHI(RashiID)
         ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_user_nakshatra FOREIGN KEY (NakshatraID) REFERENCES NAKSHATRA(NakshatraID)
         ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE USER_BLOCK (
+    BlockerUserID INT NOT NULL,
+    BlockedUserID INT NOT NULL,
+    Reason        VARCHAR(200),
+    CreatedAt     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (BlockerUserID, BlockedUserID),
+    CONSTRAINT fk_block_blocker FOREIGN KEY (BlockerUserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_block_blocked FOREIGN KEY (BlockedUserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE USER_REPORT (
+    ReportID        BIGINT NOT NULL AUTO_INCREMENT,
+    ReporterUserID  INT NOT NULL,
+    ReportedUserID  INT NOT NULL,
+    Category        VARCHAR(40) NOT NULL,
+    Details         VARCHAR(500),
+    Status          ENUM('open','reviewed','resolved') NOT NULL DEFAULT 'open',
+    CreatedAt       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ReportID),
+    KEY idx_report_target (ReportedUserID, Status),
+    CONSTRAINT fk_report_reporter FOREIGN KEY (ReporterUserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_report_reported FOREIGN KEY (ReportedUserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE USER_REPORT_ACTION (
+    ActionID       BIGINT NOT NULL AUTO_INCREMENT,
+    ReportID       BIGINT NOT NULL,
+    AdminUserID    INT NOT NULL,
+    ActionType     VARCHAR(40) NOT NULL,
+    Note           VARCHAR(500),
+    CreatedAt      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ActionID),
+    KEY idx_report_action_report (ReportID, CreatedAt),
+    CONSTRAINT fk_report_action_report FOREIGN KEY (ReportID) REFERENCES USER_REPORT(ReportID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_report_action_admin FOREIGN KEY (AdminUserID) REFERENCES USER(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── 5. MATCH_RECORD ───────────────────────────────────────────────────────

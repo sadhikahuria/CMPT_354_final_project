@@ -4,15 +4,6 @@ const db     = require('../config/db');
 const auth   = require('../middleware/auth');
 const { generateCertificate } = require('../utils/pdfCert');
 
-// ── Auth middleware that also accepts ?token= query param (for window.open PDF) ──
-function authOrQuery(req, res, next) {
-  // Prefer header, fall back to ?token= for file downloads
-  if (!req.headers.authorization && req.query.token) {
-    req.headers.authorization = `Bearer ${req.query.token}`;
-  }
-  return auth(req, res, next);
-}
-
 // ── GET /api/compatibility/history — score history for current user ────────
 // Must come BEFORE /:evalId to avoid Express swallowing it
 router.get('/history', auth, async (req, res) => {
@@ -69,8 +60,7 @@ router.get('/:evalId', auth, async (req, res) => {
 });
 
 // ── GET /api/compatibility/:evalId/certificate — download PDF ────────────
-// Uses authOrQuery so window.open() with ?token= works
-router.get('/:evalId/certificate', authOrQuery, async (req, res) => {
+router.get('/:evalId/certificate', auth, async (req, res) => {
   try {
     const [[eval_]] = await db.query(
       `SELECT ce.*, u1.Username, u1.AvatarURL, r1.RashiName, n1.NakshatraName,

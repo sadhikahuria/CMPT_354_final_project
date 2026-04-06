@@ -86,4 +86,42 @@ async function sendCompatRequestNotification(toEmail, toName, fromName) {
   });
 }
 
-module.exports = { sendLikeNotification, sendMatchNotification, sendCompatRequestNotification };
+async function sendVerificationEmail(toEmail, toName, verifyUrl) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: toEmail,
+    subject: 'Verify your Ashtakoota account',
+    html: baseTemplate('Verify your email', `
+      <p style="color:#3D2F12;font-size:16px;">Hello <strong>${toName}</strong>,</p>
+      <p style="color:#6B5837;line-height:1.7;">
+        Please verify your email to unlock likes, reading requests, and chat.
+      </p>
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${verifyUrl}" style="background:#C9A84C;color:#1A1209;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Verify Email</a>
+      </div>`),
+  });
+}
+
+async function sendPasswordResetEmail(toEmail, toName, resetUrl) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: toEmail,
+    subject: 'Reset your Ashtakoota password',
+    html: baseTemplate('Reset your password', `
+      <p style="color:#3D2F12;font-size:16px;">Hello <strong>${toName}</strong>,</p>
+      <p style="color:#6B5837;line-height:1.7;">
+        Use the link below to set a new password. This link expires soon for your security.
+      </p>
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${resetUrl}" style="background:#C9A84C;color:#1A1209;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Reset Password</a>
+      </div>`),
+  });
+}
+
+module.exports = {
+  sendLikeNotification,
+  sendMatchNotification,
+  sendCompatRequestNotification,
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+};

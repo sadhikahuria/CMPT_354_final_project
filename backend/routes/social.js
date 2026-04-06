@@ -2,8 +2,11 @@
 const router = require('express').Router();
 const db     = require('../config/db');
 const auth   = require('../middleware/auth');
+const requireVerified = require('../middleware/verified');
 const { calculateAshtakoota } = require('../utils/koota');
 const mailer = require('../utils/mailer');
+const { rateLimit } = require('../middleware/rateLimit');
+const { isBlockedEitherWay } = require('../utils/safety');
 
 // Helper: load full user data for Koota engine
 async function loadUserForKoota(userId) {
@@ -43,27 +46,35 @@ async function notify(userId, type, payload) {
 }
 
 // ── POST /api/likes/:targetId ─────────────────────────────────────────────
-router.post('/:targetId', auth, async (req, res) => {
+router.post('/:targetId', auth, requireVerified, rateLimit({
+  windowMs: 60 * 1000,
+  max: 80,
+  scope: 'like',
+  message: 'Too many likes. Please slow down.',
+}), async (req, res) => {
   try {
     const myId     = req.user.userId;
     const targetId = parseInt(req.params.targetId);
     if (myId === targetId) return res.status(400).json({ error: 'Cannot like yourself' });
+    if (await isBlockedEitherWay(myId, targetId)) {
+      return res.status(403).json({ error: 'This profile is unavailable' });
+    }
 
     // Insert or ignore (already liked)
-    await db.query(
+    const [insertResult] = await db.query(
       'INSERT IGNORE INTO LIKES (UserA, UserB) VALUES (?, ?)', [myId, targetId]
     );
 
-    // Notify target
-    await notify(targetId, 'like', { fromUserId: myId, fromUsername: req.user.username });
+    if (insertResult.affectedRows === 1) {
+      await notify(targetId, 'like', { fromUserId: myId, fromUsername: req.user.username });
 
-    // Send email notification (non-blocking)
-    try {
-      const [[target]] = await db.query('SELECT Email, Username FROM USER WHERE UserID = ?', [targetId]);
-      if (target) {
-        mailer.sendLikeNotification(target.Email, target.Username, req.user.username).catch(() => {});
-      }
-    } catch {}
+      try {
+        const [[target]] = await db.query('SELECT Email, Username FROM USER WHERE UserID = ?', [targetId]);
+        if (target) {
+          mailer.sendLikeNotification(target.Email, target.Username, req.user.username).catch(() => {});
+        }
+      } catch {}
+    }
 
     // Check for mutual like → create match + run Koota
     const [[mutual]] = await db.query(
@@ -87,14 +98,15 @@ router.post('/:targetId', auth, async (req, res) => {
           [matchId, myId, targetId]);
 
         // Run Ashtakoota
-        const boy  = await loadUserForKoota(myId);
-        const girl = await loadUserForKoota(targetId);
-        const { kootas, totalScore, matchQualityLabel } = calculateAshtakoota(boy, girl);
+        const [user1Id, user2Id] = myId < targetId ? [myId, targetId] : [targetId, myId];
+        const user1 = await loadUserForKoota(user1Id);
+        const user2 = await loadUserForKoota(user2Id);
+        const { kootas, totalScore, matchQualityLabel } = calculateAshtakoota(user1, user2);
 
         const [evalResult] = await db.query(
           `INSERT INTO COMPATIBILITY_EVAL (TotalScore, MatchQualityLabel, EvalUser1ID, EvalUser2ID)
            VALUES (?, ?, ?, ?)`,
-          [totalScore, matchQualityLabel, myId, targetId]
+          [totalScore, matchQualityLabel, user1Id, user2Id]
         );
         const evalId = evalResult.insertId;
 
@@ -108,8 +120,8 @@ router.post('/:targetId', auth, async (req, res) => {
         );
 
         // Notifications for both
-        await notify(myId,     'match', { matchId, withUserId: targetId, score: totalScore, label: matchQualityLabel });
-        await notify(targetId, 'match', { matchId, withUserId: myId,     score: totalScore, label: matchQualityLabel });
+        await notify(myId,     'match', { matchId, evalId, withUserId: targetId, score: totalScore, label: matchQualityLabel });
+        await notify(targetId, 'match', { matchId, evalId, withUserId: myId,     score: totalScore, label: matchQualityLabel });
 
         // Emails
         try {
@@ -125,14 +137,14 @@ router.post('/:targetId', auth, async (req, res) => {
       }
     }
 
-    return res.json({ liked: true, match: matchData });
+    return res.json({ liked: true, duplicate: insertResult.affectedRows === 0, match: matchData });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 });
 
 // ── DELETE /api/likes/:targetId — unlike ─────────────────────────────────
-router.delete('/:targetId', auth, async (req, res) => {
+router.delete('/:targetId', auth, requireVerified, async (req, res) => {
   await db.query('DELETE FROM LIKES WHERE UserA = ? AND UserB = ?',
     [req.user.userId, req.params.targetId]);
   return res.json({ unliked: true });

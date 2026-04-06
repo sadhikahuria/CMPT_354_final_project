@@ -3,6 +3,12 @@ const router = require('express').Router();
 const db     = require('../config/db');
 const auth   = require('../middleware/auth');
 const { sanitizeUser } = require('./auth');
+const { visibleUserFilterSql, isBlockedEitherWay } = require('../utils/safety');
+const { normalizeAvatar, normalizePlainText, stripHtml } = require('../utils/security');
+const { calculateAshtakoota } = require('../utils/koota');
+const allowedIntents = new Set(['marriage', 'long-term', 'serious-dating', 'exploring']);
+const allowedLookingFor = new Set(['man', 'woman', 'everyone']);
+const RECOMMENDED_MIN_SCORE = 25;
 
 const USER_SELECT = `
   SELECT u.*, r.RashiName, r.Varna, r.VashyaGroup, n.NakshatraName, n.Index1to27,
@@ -13,12 +19,62 @@ const USER_SELECT = `
   JOIN PLANET p ON r.PlanetID = p.PlanetID
 `;
 
+function toKootaUser(u) {
+  return {
+    userId: u.UserID,
+    username: u.Username,
+    varna: u.Varna,
+    vashyaGroup: u.VashyaGroup,
+    nakshatraIndex: u.Index1to27,
+    yoni: u.Yoni,
+    rashiRuler: u.RashiRuler,
+    gana: u.Gana,
+    nadi: u.Nadi,
+    rashiIndex: u.RashiID - 1,
+  };
+}
+
+function computeCompat(currentUser, otherUser) {
+  const [user1, user2] = currentUser.UserID < otherUser.UserID
+    ? [toKootaUser(currentUser), toKootaUser(otherUser)]
+    : [toKootaUser(otherUser), toKootaUser(currentUser)];
+  const { kootas, totalScore, matchQualityLabel } = calculateAshtakoota(user1, user2);
+  const topReasons = Object.entries(kootas)
+    .map(([type, value]) => ({
+      type,
+      score: value.score,
+      max: value.max,
+      explanation: value.explanation,
+      ratio: value.max ? value.score / value.max : 0,
+    }))
+    .filter(item => item.score > 0)
+    .sort((a, b) => {
+      if (b.ratio !== a.ratio) return b.ratio - a.ratio;
+      return b.score - a.score;
+    })
+    .slice(0, 3)
+    .map(item => ({
+      koota: item.type,
+      score: item.score,
+      max: item.max,
+      explanation: item.explanation,
+    }));
+
+  return {
+    totalScore,
+    label: matchQualityLabel,
+    reasons: topReasons,
+  };
+}
+
 // ── GET /api/users — browse all users (excluding self) ───────────────────
 router.get('/', auth, async (req, res) => {
   try {
-    const { search, minScore, rashiFilter, ganaFilter } = req.query;
-    let query = USER_SELECT + ' WHERE u.UserID != ?';
+    const { search, minScore, rashiFilter, ganaFilter, intentFilter } = req.query;
+    const visibility = await visibleUserFilterSql(req.user.userId, 'u');
+    let query = `${USER_SELECT} WHERE u.UserID != ? AND ${visibility.clause}`;
     const params = [req.user.userId];
+    params.push(...visibility.params);
 
     if (search) {
       query += ' AND (u.Username LIKE ? OR u.BirthLocation LIKE ?)';
@@ -32,29 +88,19 @@ router.get('/', auth, async (req, res) => {
       query += ' AND n.Gana = ?';
       params.push(ganaFilter);
     }
+    if (intentFilter) {
+      query += ' AND u.RelationshipIntent = ?';
+      params.push(intentFilter);
+    }
     query += ' ORDER BY u.CreatedAt DESC LIMIT 100';
+
+    const [[currentUser]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [req.user.userId]);
+    if (!currentUser) return res.status(404).json({ error: 'User not found' });
 
     const [users] = await db.query(query, params);
 
-    // Attach any existing compatibility evals with the current user
-    const userIds = users.map(u => u.UserID);
-    let evals = [];
-    if (userIds.length) {
-      [evals] = await db.query(
-        `SELECT * FROM COMPATIBILITY_EVAL
-         WHERE (EvalUser1ID = ? AND EvalUser2ID IN (?))
-            OR (EvalUser2ID = ? AND EvalUser1ID IN (?))`,
-        [req.user.userId, userIds, req.user.userId, userIds]
-      );
-    }
-
-    const evalMap = {};
-    evals.forEach(e => {
-      const otherId = e.EvalUser1ID === req.user.userId ? e.EvalUser2ID : e.EvalUser1ID;
-      evalMap[otherId] = e;
-    });
-
     // Attach like status
+    const userIds = users.map(u => u.UserID);
     let likes = [];
     if (userIds.length) {
       [likes] = await db.query(
@@ -64,20 +110,17 @@ router.get('/', auth, async (req, res) => {
     }
     const likedSet = new Set(likes.map(l => l.UserB));
 
-    const result = users.map(u => ({
-      ...sanitizeUser(u),
-      compatEval: evalMap[u.UserID] ? {
-        evalId:     evalMap[u.UserID].EvalID,
-        totalScore: evalMap[u.UserID].TotalScore,
-        label:      evalMap[u.UserID].MatchQualityLabel,
-      } : null,
-      liked: likedSet.has(u.UserID),
-    }));
+    const result = users.map(u => {
+      const compat = computeCompat(currentUser, u);
+      return {
+        ...sanitizeUser(u, { includePrivate: false }),
+        compatEval: compat,
+        liked: likedSet.has(u.UserID),
+      };
+    });
 
-    // If minScore filter, apply after eval lookup
-    const filtered = minScore
-      ? result.filter(u => u.compatEval && u.compatEval.totalScore >= parseInt(minScore))
-      : result;
+    const floor = Number.isFinite(parseInt(minScore, 10)) ? parseInt(minScore, 10) : RECOMMENDED_MIN_SCORE;
+    const filtered = result.filter(u => u.compatEval && u.compatEval.totalScore >= floor);
 
     return res.json({ users: filtered });
   } catch (err) {
@@ -88,33 +131,28 @@ router.get('/', auth, async (req, res) => {
 // ── GET /api/users/best-matches — top 3 compatible profiles ──────────────
 router.get('/best-matches', auth, async (req, res) => {
   try {
-    const [evals] = await db.query(
-      `SELECT ce.*, 
-              u1.UserID AS u1id, u2.UserID AS u2id
-       FROM COMPATIBILITY_EVAL ce
-       JOIN USER u1 ON ce.EvalUser1ID = u1.UserID
-       JOIN USER u2 ON ce.EvalUser2ID = u2.UserID
-       WHERE ce.EvalUser1ID = ? OR ce.EvalUser2ID = ?
-       ORDER BY ce.TotalScore DESC
-       LIMIT 3`,
-      [req.user.userId, req.user.userId]
+    const [[currentUser]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [req.user.userId]);
+    if (!currentUser) return res.status(404).json({ error: 'User not found' });
+    const visibility = await visibleUserFilterSql(req.user.userId, 'u');
+    const [users] = await db.query(
+      `${USER_SELECT} WHERE u.UserID != ? AND ${visibility.clause} ORDER BY u.CreatedAt DESC LIMIT 100`,
+      [req.user.userId, ...visibility.params]
     );
-
     const results = [];
-    for (const e of evals) {
-      const otherId = e.EvalUser1ID === req.user.userId ? e.EvalUser2ID : e.EvalUser1ID;
-      const [[user]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [otherId]);
-      if (user) {
-        results.push({
-          user: sanitizeUser(user),
-          evalId:     e.EvalID,
-          totalScore: e.TotalScore,
-          label:      e.MatchQualityLabel,
-        });
-      }
+    for (const user of users) {
+      if (await isBlockedEitherWay(req.user.userId, user.UserID)) continue;
+      const compat = computeCompat(currentUser, user);
+      if (compat.totalScore < RECOMMENDED_MIN_SCORE) continue;
+      results.push({
+        user: sanitizeUser(user, { includePrivate: false }),
+        totalScore: compat.totalScore,
+        label: compat.label,
+        reasons: compat.reasons,
+      });
     }
 
-    return res.json({ bestMatches: results });
+    results.sort((a, b) => b.totalScore - a.totalScore);
+    return res.json({ bestMatches: results.slice(0, 3) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -123,6 +161,9 @@ router.get('/best-matches', auth, async (req, res) => {
 // ── GET /api/users/:id — single profile ──────────────────────────────────
 router.get('/:id', auth, async (req, res) => {
   try {
+    if (await isBlockedEitherWay(req.user.userId, Number(req.params.id))) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     const [[user]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [req.params.id]);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -137,15 +178,19 @@ router.get('/:id', auth, async (req, res) => {
       'SELECT 1 FROM LIKES WHERE UserA = ? AND UserB = ?',
       [req.user.userId, user.UserID]
     );
+    const [[currentUser]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [req.user.userId]);
+    if (!currentUser) return res.status(404).json({ error: 'User not found' });
+    const compat = computeCompat(currentUser, user);
 
     return res.json({
-      user: sanitizeUser(user),
-      compatEval: evalRow ? {
-        evalId:     evalRow.EvalID,
-        totalScore: evalRow.TotalScore,
-        label:      evalRow.MatchQualityLabel,
-        evaluatedAt: evalRow.EvaluatedAtTimestamp,
-      } : null,
+      user: sanitizeUser(user, { includePrivate: false }),
+      compatEval: {
+        evalId:     evalRow?.EvalID || null,
+        totalScore: compat.totalScore,
+        label:      compat.label,
+        evaluatedAt: evalRow?.EvaluatedAtTimestamp || null,
+        reasons:    compat.reasons,
+      },
       liked: !!likeRow,
     });
   } catch (err) {
@@ -167,10 +212,28 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.patch('/me', auth, upload.single('avatar'), async (req, res) => {
   try {
-    const { bio } = req.body;
+    const { bio, profilePrompt, relationshipIntent, lookingFor } = req.body;
     const updates = {};
-    if (bio !== undefined) updates.Bio = bio.slice(0, 300);
-    if (req.file) updates.AvatarURL = `/uploads/${req.file.filename}`;
+    if (bio !== undefined) updates.Bio = normalizePlainText(stripHtml(bio), 300);
+    if (profilePrompt !== undefined) updates.ProfilePrompt = normalizePlainText(stripHtml(profilePrompt), 160);
+    if (relationshipIntent !== undefined) {
+      const value = normalizePlainText(relationshipIntent, 30).toLowerCase();
+      if (!allowedIntents.has(value)) return res.status(400).json({ error: 'Invalid relationship intent' });
+      updates.RelationshipIntent = value;
+    }
+    if (lookingFor !== undefined) {
+      const value = normalizePlainText(lookingFor, 30).toLowerCase();
+      if (!allowedLookingFor.has(value)) return res.status(400).json({ error: 'Invalid looking-for value' });
+      updates.LookingFor = value;
+    }
+    if (req.file) {
+      const normalized = await normalizeAvatar(req.file.path);
+      const finalName = `avatar-${Date.now()}${normalized.extension}`;
+      const finalPath = require('path').join(uploadDir, finalName);
+      fs.renameSync(normalized.outputPath, finalPath);
+      fs.unlinkSync(req.file.path);
+      updates.AvatarURL = `/uploads/${finalName}`;
+    }
     if (!Object.keys(updates).length) return res.status(400).json({ error: 'Nothing to update' });
 
     const setClauses = Object.keys(updates).map(k => `${k} = ?`).join(', ');

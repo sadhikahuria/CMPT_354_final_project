@@ -22,9 +22,14 @@ router.get('/list', auth, async (req, res) => {
        JOIN USER u ON u.UserID = CASE WHEN inv.UserA = ? THEN inv.UserB ELSE inv.UserA END
        JOIN RASHI r ON u.RashiID = r.RashiID
        JOIN NAKSHATRA n ON u.NakshatraID = n.NakshatraID
-       WHERE inv.UserA = ? OR inv.UserB = ?
+       WHERE (inv.UserA = ? OR inv.UserB = ?)
+         AND NOT EXISTS (
+           SELECT 1 FROM USER_BLOCK ub
+           WHERE (ub.BlockerUserID = ? AND ub.BlockedUserID = u.UserID)
+              OR (ub.BlockedUserID = ? AND ub.BlockerUserID = u.UserID)
+         )
        ORDER BY mr.MatchCreatedAt DESC`,
-      [req.user.userId, req.user.userId, req.user.userId]
+      [req.user.userId, req.user.userId, req.user.userId, req.user.userId, req.user.userId]
     );
     return res.json({ matches: rows });
   } catch (err) {

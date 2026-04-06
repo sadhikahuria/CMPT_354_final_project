@@ -1,12 +1,34 @@
 // routes/auth.js
 const router  = require('express').Router();
 const bcrypt  = require('bcrypt');
+const crypto  = require('crypto');
 const jwt     = require('jsonwebtoken');
 const db      = require('../config/db');
 const { getBirthChart } = require('../utils/astrology');
+const mailer  = require('../utils/mailer');
 const multer  = require('multer');
 const path    = require('path');
 const fs      = require('fs');
+const {
+  ageFromDate,
+  authCookieOptions,
+  cityRegion,
+  normalizeAvatar,
+  normalizeEmail,
+  normalizePlainText,
+  normalizeUsername,
+  parseCoords,
+  stripHtml,
+  validateBirthLocation,
+  validateEmail,
+  validateUsername,
+} = require('../utils/security');
+const { rateLimit } = require('../middleware/rateLimit');
+const allowedProfileEnums = {
+  genderIdentity: new Set(['man', 'woman', 'non-binary', 'prefer-not-to-say']),
+  lookingFor: new Set(['man', 'woman', 'everyone']),
+  relationshipIntent: new Set(['marriage', 'long-term', 'serious-dating', 'exploring']),
+};
 
 // ── Avatar upload config ─────────────────────────────────────────────────
 const uploadDir = process.env.UPLOAD_DIR || './uploads';
@@ -36,16 +58,119 @@ function makeToken(user) {
   );
 }
 
-// ── POST /api/auth/register ───────────────────────────────────────────────
-router.post('/register', upload.single('avatar'), async (req, res) => {
+function setAuthCookie(res, token) {
+  const options = authCookieOptions();
+  const cookie = [
+    `ashta_token=${encodeURIComponent(token)}`,
+    `Max-Age=${Math.floor(options.maxAge / 1000)}`,
+    `Path=${options.path}`,
+    `SameSite=${options.sameSite}`,
+    'HttpOnly',
+  ];
+  if (options.secure) cookie.push('Secure');
+  res.append('Set-Cookie', cookie.join('; '));
+}
+
+function clearAuthCookie(res) {
+  const options = authCookieOptions();
+  const cookie = [
+    'ashta_token=',
+    'Max-Age=0',
+    `Path=${options.path}`,
+    `SameSite=${options.sameSite}`,
+    'HttpOnly',
+  ];
+  if (options.secure) cookie.push('Secure');
+  res.append('Set-Cookie', cookie.join('; '));
+}
+
+function randomToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+function frontendUrl() {
+  return process.env.FRONTEND_URL || 'http://localhost:3000';
+}
+
+async function issueVerificationForUser(userId, email, username) {
+  const token = randomToken();
+  const tokenHash = hashToken(token);
+  await db.query(
+    `UPDATE USER
+     SET EmailVerifyTokenHash = ?, EmailVerifyExpiresAt = DATE_ADD(NOW(), INTERVAL 24 HOUR)
+     WHERE UserID = ?`,
+    [tokenHash, userId]
+  );
   try {
-    const { username, email, password, dateOfBirth, timeOfBirth, birthLocation, latitude, longitude, bio } = req.body;
+    await mailer.sendVerificationEmail(
+      email,
+      username,
+      `${frontendUrl()}/?verify=${encodeURIComponent(token)}`
+    );
+  } catch {}
+}
+
+async function issuePasswordResetForUser(userId, email, username) {
+  const token = randomToken();
+  const tokenHash = hashToken(token);
+  await db.query(
+    `UPDATE USER
+     SET PasswordResetTokenHash = ?, PasswordResetExpiresAt = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+     WHERE UserID = ?`,
+    [tokenHash, userId]
+  );
+  try {
+    await mailer.sendPasswordResetEmail(
+      email,
+      username,
+      `${frontendUrl()}/?reset=${encodeURIComponent(token)}`
+    );
+  } catch {}
+}
+
+// ── POST /api/auth/register ───────────────────────────────────────────────
+router.post('/register', rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  scope: 'register',
+  message: 'Too many registration attempts. Please try again later.',
+}), upload.single('avatar'), async (req, res) => {
+  try {
+    const { password, dateOfBirth, timeOfBirth } = req.body;
+    const username = normalizeUsername(req.body.username);
+    const email = normalizeEmail(req.body.email);
+    const birthLocation = normalizePlainText(stripHtml(req.body.birthLocation || ''), 150);
+    const bio = normalizePlainText(stripHtml(req.body.bio || ''), 300);
+    const profilePrompt = normalizePlainText(stripHtml(req.body.profilePrompt || ''), 160);
+    const genderIdentity = normalizePlainText(req.body.genderIdentity || '', 30).toLowerCase();
+    const lookingFor = normalizePlainText(req.body.lookingFor || '', 30).toLowerCase();
+    const relationshipIntent = normalizePlainText(req.body.relationshipIntent || '', 30).toLowerCase();
+    const safetyConsent = String(req.body.safetyConsent || '').toLowerCase() === 'true';
 
     // Basic validation
-    if (!username || !email || !password || !dateOfBirth || !timeOfBirth || !birthLocation) {
+    if (!username || !email || !password || !dateOfBirth || !timeOfBirth || !birthLocation || !genderIdentity || !lookingFor || !relationshipIntent) {
       return res.status(400).json({ error: 'All fields are required' });
     }
     if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    if (!validateUsername(username)) {
+      return res.status(400).json({ error: 'Username must be 2-30 chars and use only letters, numbers, spaces, dots, underscores, or hyphens' });
+    }
+    if (!validateEmail(email)) return res.status(400).json({ error: 'Please enter a valid email address' });
+    if (!validateBirthLocation(birthLocation)) return res.status(400).json({ error: 'Birth location is required' });
+    if (!allowedProfileEnums.genderIdentity.has(genderIdentity)) return res.status(400).json({ error: 'Select a valid gender identity' });
+    if (!allowedProfileEnums.lookingFor.has(lookingFor)) return res.status(400).json({ error: 'Select who you want to meet' });
+    if (!allowedProfileEnums.relationshipIntent.has(relationshipIntent)) return res.status(400).json({ error: 'Select your relationship intent' });
+    if (!safetyConsent) return res.status(400).json({ error: 'You must confirm you are 18+ and agree to respectful conduct' });
+
+    const age = ageFromDate(dateOfBirth);
+    if (!age || age < 18) return res.status(400).json({ error: 'You must be at least 18 years old to join' });
+
+    const coords = parseCoords(req.body.latitude, req.body.longitude);
+    if (!coords) return res.status(400).json({ error: 'Please select a valid birth city from the dropdown results' });
 
     // Check uniqueness
     const [existing] = await db.query(
@@ -54,9 +179,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     if (existing.length) return res.status(409).json({ error: 'Username or email already taken' });
 
     // Derive Moon Rashi + Nakshatra from birth details
-    const lat = parseFloat(latitude) || 19.076;  // default: Mumbai
-    const lng = parseFloat(longitude) || 72.877;
-    const chart = await getBirthChart(dateOfBirth, timeOfBirth, lat, lng);
+    const chart = await getBirthChart(dateOfBirth, timeOfBirth, coords.latitude, coords.longitude);
 
     // Look up RashiID and NakshatraID
     const [[rashi]]     = await db.query('SELECT RashiID FROM RASHI WHERE RashiName = ?',     [chart.rashiName]);
@@ -67,16 +190,24 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const avatarURL = req.file
-      ? `/uploads/${req.file.filename}`
-      : null;
+    let avatarURL = null;
+    if (req.file) {
+      const normalized = await normalizeAvatar(req.file.path);
+      const finalName = `${path.basename(req.file.filename, path.extname(req.file.filename))}${normalized.extension}`;
+      const finalPath = path.join(uploadDir, finalName);
+      fs.renameSync(normalized.outputPath, finalPath);
+      fs.unlinkSync(req.file.path);
+      avatarURL = `/uploads/${finalName}`;
+    }
 
     const [result] = await db.query(
       `INSERT INTO USER (Username, Email, PasswordHash, DateOfBirth, TimeOfBirth,
-        BirthLocation, Latitude, Longitude, RashiID, NakshatraID, AvatarURL, Bio)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        BirthLocation, Latitude, Longitude, RashiID, NakshatraID, AvatarURL, Bio,
+        GenderIdentity, LookingFor, RelationshipIntent, ProfilePrompt, AcceptedSafetyAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [username, email, passwordHash, dateOfBirth, timeOfBirth,
-       birthLocation, lat, lng, rashi.RashiID, nakshatra.NakshatraID, avatarURL, bio || null]
+       birthLocation, coords.latitude, coords.longitude, rashi.RashiID, nakshatra.NakshatraID, avatarURL, bio || null,
+       genderIdentity, lookingFor, relationshipIntent, profilePrompt || null]
     );
 
     const [[user]] = await db.query(
@@ -89,8 +220,10 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
        WHERE u.UserID = ?`, [result.insertId]
     );
 
+    const token = makeToken(user);
+    setAuthCookie(res, token);
+    await issueVerificationForUser(user.UserID, user.Email, user.Username);
     return res.status(201).json({
-      token: makeToken(user),
       user: sanitizeUser(user),
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
     });
@@ -101,9 +234,15 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 });
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────
-router.post('/login', async (req, res) => {
+router.post('/login', rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  scope: 'login',
+  message: 'Too many login attempts. Please try again later.',
+}), async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const { password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
     const [[user]] = await db.query(
@@ -121,10 +260,89 @@ router.post('/login', async (req, res) => {
     const ok = await bcrypt.compare(password, user.PasswordHash);
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
 
-    return res.json({ token: makeToken(user), user: sanitizeUser(user) });
+    const token = makeToken(user);
+    setAuthCookie(res, token);
+    return res.json({ user: sanitizeUser(user) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+});
+
+router.post('/logout', (req, res) => {
+  clearAuthCookie(res);
+  return res.json({ ok: true });
+});
+
+router.post('/resend-verification', rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  scope: 'resend-verification',
+  message: 'Too many verification email requests. Please try again later.',
+}), async (req, res) => {
+  const email = normalizeEmail(req.body.email);
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const [[user]] = await db.query('SELECT UserID, Email, Username, EmailVerifiedAt FROM USER WHERE Email = ?', [email]);
+  if (!user) return res.json({ ok: true });
+  if (!user.EmailVerifiedAt) {
+    await issueVerificationForUser(user.UserID, user.Email, user.Username);
+  }
+  return res.json({ ok: true });
+});
+
+router.post('/verify-email', async (req, res) => {
+  const token = String(req.body.token || '');
+  if (!token) return res.status(400).json({ error: 'Verification token required' });
+  const tokenHash = hashToken(token);
+  const [[user]] = await db.query(
+    `SELECT UserID FROM USER
+     WHERE EmailVerifyTokenHash = ? AND EmailVerifyExpiresAt > NOW()`,
+    [tokenHash]
+  );
+  if (!user) return res.status(400).json({ error: 'Invalid or expired verification token' });
+  await db.query(
+    `UPDATE USER
+     SET EmailVerifiedAt = NOW(), EmailVerifyTokenHash = NULL, EmailVerifyExpiresAt = NULL
+     WHERE UserID = ?`,
+    [user.UserID]
+  );
+  return res.json({ verified: true });
+});
+
+router.post('/forgot-password', rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  scope: 'forgot-password',
+  message: 'Too many password reset requests. Please try again later.',
+}), async (req, res) => {
+  const email = normalizeEmail(req.body.email);
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const [[user]] = await db.query('SELECT UserID, Email, Username FROM USER WHERE Email = ?', [email]);
+  if (user) {
+    await issuePasswordResetForUser(user.UserID, user.Email, user.Username);
+  }
+  return res.json({ ok: true });
+});
+
+router.post('/reset-password', async (req, res) => {
+  const token = String(req.body.token || '');
+  const password = String(req.body.password || '');
+  if (!token || !password) return res.status(400).json({ error: 'Token and password required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  const tokenHash = hashToken(token);
+  const [[user]] = await db.query(
+    `SELECT UserID FROM USER
+     WHERE PasswordResetTokenHash = ? AND PasswordResetExpiresAt > NOW()`,
+    [tokenHash]
+  );
+  if (!user) return res.status(400).json({ error: 'Invalid or expired reset token' });
+  const passwordHash = await bcrypt.hash(password, 12);
+  await db.query(
+    `UPDATE USER
+     SET PasswordHash = ?, PasswordResetTokenHash = NULL, PasswordResetExpiresAt = NULL
+     WHERE UserID = ?`,
+    [passwordHash, user.UserID]
+  );
+  return res.json({ reset: true });
 });
 
 // ── GET /api/auth/me ──────────────────────────────────────────────────────
@@ -143,14 +361,18 @@ router.get('/me', requireAuth, async (req, res) => {
   return res.json({ user: sanitizeUser(user) });
 });
 
-function sanitizeUser(u) {
-  return {
+function sanitizeUser(u, options = {}) {
+  const includePrivate = options.includePrivate !== false;
+  const age = ageFromDate(u.DateOfBirth);
+  const adminEmails = new Set(
+    String(process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map(email => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
+  const base = {
     id:            u.UserID,
     username:      u.Username,
-    email:         u.Email,
-    dateOfBirth:   u.DateOfBirth,
-    timeOfBirth:   u.TimeOfBirth,
-    birthLocation: u.BirthLocation,
     rashi:         u.RashiName,
     nakshatra:     u.NakshatraName,
     gana:          u.Gana,
@@ -163,7 +385,32 @@ function sanitizeUser(u) {
     rashiIndex:    u.RashiID - 1,  // 0-indexed for Koota engine
     avatarURL:     u.AvatarURL,
     bio:           u.Bio,
+    profilePrompt: u.ProfilePrompt,
+    genderIdentity: u.GenderIdentity,
+    lookingFor: u.LookingFor,
+    relationshipIntent: u.RelationshipIntent,
+    emailVerified: !!u.EmailVerifiedAt,
+    isAdmin: adminEmails.has(String(u.Email || '').toLowerCase()),
     createdAt:     u.CreatedAt,
+    age,
+    cityRegion:    cityRegion(u.BirthLocation),
+  };
+
+  if (includePrivate) {
+    return {
+      ...base,
+      email:         u.Email,
+      dateOfBirth:   u.DateOfBirth,
+      timeOfBirth:   u.TimeOfBirth,
+      birthLocation: u.BirthLocation,
+      latitude:      u.Latitude,
+      longitude:     u.Longitude,
+    };
+  }
+
+  return {
+    ...base,
+    birthLocation: cityRegion(u.BirthLocation),
   };
 }
 

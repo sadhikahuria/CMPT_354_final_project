@@ -2,6 +2,10 @@
 const router = require('express').Router();
 const db     = require('../config/db');
 const auth   = require('../middleware/auth');
+const requireVerified = require('../middleware/verified');
+const { isBlockedEitherWay } = require('../utils/safety');
+const { normalizePlainText, stripHtml } = require('../utils/security');
+const { rateLimit } = require('../middleware/rateLimit');
 
 // Verify the requesting user is part of the match
 async function verifyMatchAccess(matchId, userId) {
@@ -12,12 +16,24 @@ async function verifyMatchAccess(matchId, userId) {
   return !!row;
 }
 
+async function matchOtherUser(matchId, userId) {
+  const [[row]] = await db.query(
+    'SELECT CASE WHEN UserA = ? THEN UserB ELSE UserA END AS otherUserId FROM INVOLVES WHERE MatchID = ? AND (UserA = ? OR UserB = ?)',
+    [userId, matchId, userId, userId]
+  );
+  return row?.otherUserId || null;
+}
+
 // ── GET /api/chat/:matchId/messages ──────────────────────────────────────
 router.get('/:matchId/messages', auth, async (req, res) => {
   try {
     const matchId = parseInt(req.params.matchId);
     if (!(await verifyMatchAccess(matchId, req.user.userId))) {
       return res.status(403).json({ error: 'Not a participant in this match' });
+    }
+    const otherUserId = await matchOtherUser(matchId, req.user.userId);
+    if (otherUserId && await isBlockedEitherWay(req.user.userId, otherUserId)) {
+      return res.status(403).json({ error: 'This conversation is unavailable' });
     }
 
     const limit  = Math.min(parseInt(req.query.limit) || 50, 100);
@@ -44,19 +60,34 @@ router.get('/:matchId/messages', auth, async (req, res) => {
 });
 
 // ── POST /api/chat/:matchId/messages (fallback for no-WS clients) ─────────
-router.post('/:matchId/messages', auth, async (req, res) => {
+router.post('/:matchId/messages', auth, requireVerified, rateLimit({
+  windowMs: 60 * 1000,
+  max: 40,
+  scope: 'chat-post',
+  message: 'Too many messages. Please slow down.',
+}), async (req, res) => {
   try {
     const matchId = parseInt(req.params.matchId);
     if (!(await verifyMatchAccess(matchId, req.user.userId))) {
       return res.status(403).json({ error: 'Not a participant in this match' });
     }
-    const { body } = req.body;
+    const otherUserId = await matchOtherUser(matchId, req.user.userId);
+    if (otherUserId && await isBlockedEitherWay(req.user.userId, otherUserId)) {
+      return res.status(403).json({ error: 'This conversation is unavailable' });
+    }
+    const body = normalizePlainText(stripHtml(req.body.body || ''), 2000);
     if (!body || !body.trim()) return res.status(400).json({ error: 'Message body required' });
     const [result] = await db.query(
       'INSERT INTO MESSAGES (MatchID, SenderID, Body) VALUES (?, ?, ?)',
       [matchId, req.user.userId, body.trim().slice(0, 2000)]
     );
     const [[msg]] = await db.query('SELECT * FROM MESSAGES WHERE MessageID = ?', [result.insertId]);
+    if (otherUserId) {
+      await db.query(
+        'INSERT INTO NOTIFICATIONS (UserID, Type, Payload) VALUES (?, ?, ?)',
+        [otherUserId, 'message', JSON.stringify({ fromUserId: req.user.userId, fromUsername: req.user.username, matchId })]
+      );
+    }
     return res.status(201).json({ message: msg });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -73,7 +104,8 @@ module.exports.setupChat = function setupChat(io) {
   const chatNs = io.of('/chat');
 
   chatNs.use((socket, next) => {
-    const token = socket.handshake.auth?.token;
+    const token = socket.handshake.auth?.token
+      || auth.extractToken({ headers: socket.handshake.headers });
     if (!token) return next(new Error('Unauthenticated'));
     try {
       socket.user = jwt.verify(token, process.env.JWT_SECRET);
@@ -95,16 +127,27 @@ module.exports.setupChat = function setupChat(io) {
 
     // Send a message
     socket.on('send_message', async ({ matchId, body }) => {
-      if (!body?.trim()) return;
+      const cleanBody = normalizePlainText(stripHtml(body || ''), 2000);
+      if (!cleanBody) return;
       const ok = await verifyMatchAccess(matchId, userId);
       if (!ok) return socket.emit('error', 'Not a participant');
+      const otherUserId = await matchOtherUser(matchId, userId);
+      if (otherUserId && await isBlockedEitherWay(userId, otherUserId)) {
+        return socket.emit('error', 'Conversation unavailable');
+      }
 
       try {
         const [result] = await db.query(
           'INSERT INTO MESSAGES (MatchID, SenderID, Body) VALUES (?, ?, ?)',
-          [matchId, userId, body.trim().slice(0, 2000)]
+          [matchId, userId, cleanBody]
         );
         const [[msg]] = await db.query('SELECT * FROM MESSAGES WHERE MessageID = ?', [result.insertId]);
+        if (otherUserId) {
+          await db.query(
+            'INSERT INTO NOTIFICATIONS (UserID, Type, Payload) VALUES (?, ?, ?)',
+            [otherUserId, 'message', JSON.stringify({ fromUserId: userId, fromUsername: socket.user.username, matchId })]
+          );
+        }
 
         // Broadcast to both participants in the room
         chatNs.to(`match:${matchId}`).emit('new_message', {

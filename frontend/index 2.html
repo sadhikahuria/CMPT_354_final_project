@@ -163,8 +163,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 .profile-name:hover{color:var(--gold-dim);}
 .profile-astro{font-size:12px;color:var(--ink-soft);margin-top:2px;}
 .profile-score-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
-.profile-reasons{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
-.profile-reason{font-size:11px;line-height:1.5;color:var(--ink-soft);padding:7px 9px;border-radius:8px;background:rgba(201,168,76,.08);border:.5px solid var(--border);}
 .compat-badge{font-size:11px;font-weight:500;letter-spacing:.04em;padding:3px 10px;border-radius:20px;text-transform:uppercase;}
 .compat-badge.excellent{background:#E8F5E9;color:#2E6B2E;}
 .compat-badge.good{background:#FFF8E7;color:#7D6225;}
@@ -288,19 +286,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 .history-partner{font-size:14px;font-weight:500;flex:1;}
 .history-sign{font-size:12px;color:var(--ink-soft);}
 .history-score{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--gold);}
-.admin-report{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;}
-.admin-report-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
-.admin-report-meta{font-size:12px;color:var(--ink-soft);line-height:1.6;}
-.admin-report-title{font-size:15px;font-weight:500;color:var(--ink);}
-.admin-report-details{font-size:13px;color:var(--ink-mid);line-height:1.6;margin-top:8px;}
-.admin-action-log{margin-top:10px;padding-top:10px;border-top:.5px solid var(--border);display:flex;flex-direction:column;gap:8px;}
-.admin-action-item{font-size:12px;color:var(--ink-soft);line-height:1.5;}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:var(--parchment);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
-.verify-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:rgba(201,168,76,.12);border:.5px solid var(--border-strong);border-radius:12px;padding:14px 16px;margin-bottom:1.5rem;font-size:13px;color:var(--ink-mid);}
-.verify-banner.show{display:flex;}
 
 /* ── LOADING ── */
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border-strong);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
@@ -361,9 +350,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
   <div class="hero">
     <div class="hero-text">
       <h1>Find your<br><em>cosmic match</em></h1>
-      <p class="hero-subtitle">A Vedic-first dating app for people seeking intentional relationships. Build a real profile, meet people aligned with your intent, and unlock an 8-Koota compatibility reading when interest becomes mutual.</p>
+      <p class="hero-subtitle">Ashtakoota uses ancient Vedic astrology to calculate your compatibility across 8 sacred dimensions — Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot & Nadi.</p>
       <div class="hero-actions">
-        <button class="btn-lg primary" onclick="openAuth('register')">Create my profile</button>
+        <button class="btn-lg primary" onclick="openAuth('register')">Get your reading</button>
         <button class="btn-lg outline" onclick="openAuth('login')">Sign in</button>
       </div>
     </div>
@@ -394,14 +383,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
   <div class="features-section">
     <div class="features-inner">
       <div class="section-label">How it works</div>
-      <div class="section-title">Intentional dating with real structure</div>
+      <div class="section-title">Ancient wisdom, modern love</div>
       <div class="features-grid">
-        <div class="feature-card"><div class="feature-num">01</div><div class="feature-title">Build a real dating profile</div><div class="feature-desc">Share your age, region, relationship intent, and what kind of partner you want to meet, alongside your Vedic chart markers.</div></div>
-        <div class="feature-card"><div class="feature-num">02</div><div class="feature-title">Filter by intent</div><div class="feature-desc">Browse people by astrology, but also by seriousness. Long-term, marriage-minded, and exploratory daters should not all be mixed together.</div></div>
-        <div class="feature-card"><div class="feature-num">03</div><div class="feature-title">Like with clarity</div><div class="feature-desc">Use likes to express genuine romantic interest. When the feeling is mutual, the app opens chat and treats the connection like a real match.</div></div>
-        <div class="feature-card"><div class="feature-num">04</div><div class="feature-title">Reveal compatibility intentionally</div><div class="feature-desc">Send a reading request when you want a deeper look. Once accepted, all 8 Kootas are calculated instantly with a detailed breakdown.</div></div>
-        <div class="feature-card"><div class="feature-num">05</div><div class="feature-title">Safer by design</div><div class="feature-desc">Profiles can be blocked, reported, and filtered out of your feed. The product is built for public release, not just a demo flow.</div></div>
-        <div class="feature-card"><div class="feature-num">06</div><div class="feature-title">Keep the meaningful stuff</div><div class="feature-desc">See your strongest matches, review past readings, and save a polished compatibility certificate when a connection deserves it.</div></div>
+        <div class="feature-card"><div class="feature-num">01</div><div class="feature-title">Enter your birth details</div><div class="feature-desc">We derive your Moon Rashi and Nakshatra automatically from your date, time and place of birth using Vedic ephemeris.</div></div>
+        <div class="feature-card"><div class="feature-num">02</div><div class="feature-title">Request a reading</div><div class="feature-desc">Browse profiles and send a compatibility request. When they accept, all 8 Kootas are calculated instantly — 36 points total.</div></div>
+        <div class="feature-card"><div class="feature-num">03</div><div class="feature-title">Match &amp; connect</div><div class="feature-desc">When both of you like each other, you're matched. Chat, download your Guna Milan certificate, and let the stars guide you.</div></div>
+        <div class="feature-card"><div class="feature-num">04</div><div class="feature-title">Score history</div><div class="feature-desc">Track all your compatibility readings over time. See how your cosmic landscape evolves as more profiles join.</div></div>
+        <div class="feature-card"><div class="feature-num">05</div><div class="feature-title">Best match ranking</div><div class="feature-desc">Your dashboard shows your top 3 most compatible profiles, ranked by total Guna score across all 8 dimensions.</div></div>
+        <div class="feature-card"><div class="feature-num">06</div><div class="feature-title">Guna Milan PDF</div><div class="feature-desc">Download a beautifully formatted PDF certificate of your compatibility report — perfect for sharing with family.</div></div>
       </div>
     </div>
   </div>
@@ -422,51 +411,19 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
       <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com" /></div>
       <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••" /></div>
       <button class="form-btn" id="login-btn" onclick="doLogin()">Sign in</button>
-      <p class="form-switch"><a onclick="requestPasswordReset()">Forgot password?</a></p>
       <p class="form-switch">New here? <a onclick="switchAuth('register')">Create account</a></p>
     </div>
 
     <!-- REGISTER -->
     <div id="auth-register" style="display:none;">
       <h2>Join Ashtakoota</h2>
-      <p class="modal-sub">Create a relationship-ready profile. We use your birth details for Vedic matching, but your profile should still feel human.</p>
+      <p class="modal-sub">Enter your birth details — we'll derive your Rashi &amp; Nakshatra</p>
       <div class="form-error" id="register-error"></div>
       <div class="form-row">
         <div class="form-group"><label>Username</label><input type="text" id="reg-username" placeholder="arjun_v" /></div>
         <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com" /></div>
       </div>
       <div class="form-group"><label>Password</label><input type="password" id="reg-password" placeholder="Min 8 characters" /></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>I am</label>
-          <select id="reg-gender">
-            <option value="">Select</option>
-            <option value="man">Man</option>
-            <option value="woman">Woman</option>
-            <option value="non-binary">Non-binary</option>
-            <option value="prefer-not-to-say">Prefer not to say</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Looking for</label>
-          <select id="reg-looking-for">
-            <option value="">Select</option>
-            <option value="woman">Women</option>
-            <option value="man">Men</option>
-            <option value="everyone">Everyone</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Relationship intent</label>
-        <select id="reg-intent">
-          <option value="">Select your intent</option>
-          <option value="marriage">Marriage-minded</option>
-          <option value="long-term">Long-term relationship</option>
-          <option value="serious-dating">Serious dating</option>
-          <option value="exploring">Exploring slowly</option>
-        </select>
-      </div>
       <div class="form-row">
         <div class="form-group"><label>Date of Birth</label><input type="date" id="reg-dob" /></div>
         <div class="form-group"><label>Time of Birth</label><input type="time" id="reg-tob" /></div>
@@ -481,20 +438,15 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
         <div id="city-confirm" style="display:none;margin-top:6px;font-size:12px;color:var(--accent-teal);">✓ <span id="city-confirm-text"></span></div>
         <p class="form-hint">Select your birth city from the dropdown — coordinates fill automatically.</p>
       </div>
-      <div class="form-group"><label>Profile headline <span style="font-weight:400;text-transform:none;">(optional)</span></label><input type="text" id="reg-prompt" maxlength="160" placeholder="A grounded romantic who values warmth, family, and emotional maturity." /></div>
-      <div class="form-group"><label>Bio <span style="font-weight:400;text-transform:none;">(optional)</span></label><textarea id="reg-bio" rows="2" placeholder="What makes you a good partner? What kind of connection are you hoping to build?" style="resize:vertical;"></textarea></div>
+      <div class="form-group"><label>Bio <span style="font-weight:400;text-transform:none;">(optional)</span></label><textarea id="reg-bio" rows="2" placeholder="A little about you…" style="resize:vertical;"></textarea></div>
       <div class="form-group"><label>Profile Photo <span style="font-weight:400;text-transform:none;">(optional)</span></label><input type="file" id="reg-avatar" accept="image/*" /></div>
-      <div class="form-group" style="display:flex;gap:10px;align-items:flex-start;">
-        <input type="checkbox" id="reg-safety" style="width:auto;margin-top:4px;" />
-        <label for="reg-safety" style="font-size:12px;letter-spacing:0;text-transform:none;line-height:1.5;">I confirm I am 18+ and will treat other members respectfully. Harassment, impersonation, and unsafe conduct can lead to removal.</label>
-      </div>
       <div id="astro-preview" style="display:none;">
         <div class="astro-result">
           <div class="astro-result-label">Your birth chart</div>
           <div class="astro-tags-inline" id="astro-tags-preview"></div>
         </div>
       </div>
-      <button class="form-btn" id="register-btn" onclick="doRegister()">Create profile &amp; see my chart</button>
+      <button class="form-btn" id="register-btn" onclick="doRegister()">Create account &amp; see your chart</button>
       <p class="form-switch">Already have an account? <a onclick="switchAuth('login')">Sign in</a></p>
     </div>
   </div>
@@ -513,7 +465,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
       <button class="nav-link" onclick="showSection('chat')">Chat</button>
       <button class="nav-link" onclick="showSection('requests')">Requests <span id="req-badge" style="display:none;background:var(--accent-red);color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;margin-left:4px;"></span></button>
       <button class="nav-link" onclick="showSection('history')">History</button>
-      <button class="nav-link" id="admin-nav-link" style="display:none;" onclick="showSection('admin')">Moderation</button>
     </div>
     <div class="nav-right">
       <div class="notif-dot">
@@ -536,7 +487,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
         <div class="sidebar-divider"></div>
         <button class="sidebar-item" onclick="showSection('requests')"><span class="sidebar-icon">✧</span> Requests</button>
         <button class="sidebar-item" onclick="showSection('history')"><span class="sidebar-icon">◷</span> Score History</button>
-        <button class="sidebar-item" id="admin-sidebar-link" style="display:none;" onclick="showSection('admin')"><span class="sidebar-icon">⚑</span> Moderation</button>
         <div class="sidebar-divider"></div>
         <button class="sidebar-item" onclick="showSection('my-profile')"><span class="sidebar-icon">◉</span> My Profile</button>
       </div>
@@ -546,11 +496,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 
       <!-- DASHBOARD -->
       <div class="section active" id="sec-dashboard">
-        <div class="verify-banner" id="verify-banner">
-          <div id="verify-banner-text">Verify your email to unlock likes, requests, chat, and reports.</div>
-          <button class="btn-primary" style="font-size:12px;padding:7px 14px;" onclick="resendVerification()">Resend verification</button>
-        </div>
-        <div class="section-header"><h2>Dashboard</h2><p>Your dating overview, guided by compatibility</p></div>
+        <div class="section-header"><h2>Dashboard</h2><p>Your cosmic overview</p></div>
         <div class="dash-grid">
           <div class="stat-card"><div class="stat-num" id="stat-matches">—</div><div class="stat-label">Mutual matches</div></div>
           <div class="stat-card"><div class="stat-num" id="stat-readings">—</div><div class="stat-label">Readings done</div></div>
@@ -558,11 +504,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
         </div>
         <div class="dash-row">
           <div class="card">
-            <div class="card-title">Aligned profiles</div>
+            <div class="card-title">Suggested profiles</div>
             <div class="profiles-grid" id="suggested-grid"><div class="empty"><div class="spinner"></div></div></div>
           </div>
           <div class="card">
-            <div class="card-title">Most promising matches</div>
+            <div class="card-title">Best matches</div>
             <div id="best-matches-list"><div class="empty"><div class="spinner"></div></div></div>
           </div>
         </div>
@@ -570,16 +516,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 
       <!-- BROWSE -->
       <div class="section" id="sec-browse">
-        <div class="section-header"><h2>Browse</h2><p>Only profiles scoring 25 to 36 are recommended to you</p></div>
+        <div class="section-header"><h2>Browse</h2><p>Discover compatible souls</p></div>
         <div class="filter-bar">
           <input class="filter-input" id="browse-search" placeholder="Search by username or location…" oninput="debounceFilter()" />
-          <select class="filter-select" id="browse-intent" onchange="loadBrowse()">
-            <option value="">Any intent</option>
-            <option value="marriage">Marriage-minded</option>
-            <option value="long-term">Long-term</option>
-            <option value="serious-dating">Serious dating</option>
-            <option value="exploring">Exploring</option>
-          </select>
           <select class="filter-select" id="browse-rashi" onchange="loadBrowse()">
             <option value="">All Rashis</option>
             <option>Aries</option><option>Taurus</option><option>Gemini</option><option>Cancer</option>
@@ -591,7 +530,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
             <option>Deva</option><option>Manushya</option><option>Rakshasa</option>
           </select>
           <select class="filter-select" id="browse-minscore" onchange="loadBrowse()">
-            <option value="">Recommended (25+)</option>
+            <option value="">Any score</option>
             <option value="25">Good+ (25+)</option>
             <option value="33">Excellent (33+)</option>
           </select>
@@ -638,19 +577,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
         <div class="history-list" id="history-list"><div class="empty"><div class="spinner"></div></div></div>
       </div>
 
-      <div class="section" id="sec-admin">
-        <div class="section-header"><h2>Moderation</h2><p>Review community reports and resolve them quickly</p></div>
-        <div class="filter-bar">
-          <select class="filter-select" id="admin-status-filter" onchange="loadAdminReports()">
-            <option value="open">Open</option>
-            <option value="reviewed">Reviewed</option>
-            <option value="resolved">Resolved</option>
-            <option value="all">All</option>
-          </select>
-        </div>
-        <div id="admin-reports-list"><div class="empty"><div class="empty-text">Admin access required</div></div></div>
-      </div>
-
       <!-- COMPAT DETAIL -->
       <div class="section" id="sec-compat">
         <button class="btn-ghost" style="margin-bottom:1.25rem;" onclick="goBack()">← Back</button>
@@ -688,8 +614,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
         <div style="display:flex;gap:10px;margin-top:1.5rem;">
           <button class="like-btn" id="profile-like-btn" onclick="toggleLike(null)">♡ Like</button>
           <button class="req-btn" id="profile-req-btn" onclick="sendCompatRequest(null)">✧ Request Reading</button>
-          <button class="btn-ghost" id="profile-report-btn" onclick="reportSelectedUser()">Report</button>
-          <button class="btn-danger" id="profile-block-btn" onclick="toggleBlockSelectedUser()">Block</button>
         </div>
       </div>
 
@@ -714,7 +638,7 @@ const API = window.__ASHTAKOOTA_CONFIG__?.API_BASE_URL
     : window.location.origin);
 
 // ── State ─────────────────────────────────────────────
-let token = null;
+let token = localStorage.getItem('ashta_token');
 let currentUser = null;
 let currentSection = 'dashboard';
 let previousSection = null;
@@ -724,75 +648,13 @@ let selectedMatchId = null;
 let activeChatMatchId = null;
 let wsSocket = null;
 let filterTimer = null;
-let blockedUserIds = new Set();
-
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[char]);
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value);
-}
-
-function escapeJsString(value) {
-  return String(value ?? '')
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '');
-}
-
-function displayLocation(user) {
-  return user.cityRegion || user.birthLocation || 'Location private';
-}
-
-function displayAge(user) {
-  return Number.isFinite(user.age) ? `${user.age}` : 'Age private';
-}
-
-function titleizeEnum(value) {
-  if (!value) return 'Not set';
-  return String(value).split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
-}
-
-function updateVerificationBanner() {
-  const banner = document.getElementById('verify-banner');
-  if (!banner) return;
-  banner.classList.toggle('show', !!currentUser && !currentUser.emailVerified);
-}
-
-function updateAdminVisibility() {
-  const visible = !!currentUser?.isAdmin;
-  const nav = document.getElementById('admin-nav-link');
-  const side = document.getElementById('admin-sidebar-link');
-  if (nav) nav.style.display = visible ? '' : 'none';
-  if (side) side.style.display = visible ? '' : 'none';
-}
-
-function alignsWithDatingIntent(user) {
-  if (!currentUser) return 0;
-  let score = 0;
-  if (user.relationshipIntent && currentUser.relationshipIntent && user.relationshipIntent === currentUser.relationshipIntent) score += 3;
-  if (currentUser.lookingFor === 'everyone' || user.genderIdentity === currentUser.lookingFor) score += 2;
-  if (user.lookingFor === 'everyone' || currentUser.genderIdentity === user.lookingFor) score += 2;
-  if (user.compatEval?.totalScore) score += user.compatEval.totalScore / 10;
-  return score;
-}
 
 // ── API helper ────────────────────────────────────────
 async function api(method, path, body, isFormData) {
   const opts = {
     method,
-    credentials: 'include',
-    headers: {},
+    headers: { Authorization: token ? `Bearer ${token}` : '' },
   };
-  if (token) opts.headers.Authorization = `Bearer ${token}`;
   if (body && !isFormData) {
     opts.headers['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(body);
@@ -801,7 +663,7 @@ async function api(method, path, body, isFormData) {
   }
   try {
     const res = await fetch(API + path, opts);
-    if (res.status === 401) { doLogout(true); return null; }
+    if (res.status === 401) { doLogout(); return null; }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
     return data;
@@ -821,7 +683,7 @@ function setLoading(on) {
 // ── Toast ─────────────────────────────────────────────
 function toast(msg, duration = 3000) {
   const t = document.getElementById('toast');
-  t.textContent = String(msg);
+  t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
 }
@@ -847,7 +709,6 @@ function showSection(id) {
   if (id === 'chat') loadChatList();
   if (id === 'requests') loadRequests();
   if (id === 'history') loadHistory();
-  if (id === 'admin') loadAdminReports();
   if (id === 'my-profile') renderMyProfile();
 }
 
@@ -904,8 +765,8 @@ async function citySearch(query) {
           style="padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:.5px solid var(--border);transition:background .1s;"
           onmouseenter="this.style.background='var(--parchment-mid)'"
           onmouseleave="this.style.background=''"
-          onclick="selectCity('${escapeJsString(displayName)}', ${Number.parseFloat(r.lat)}, ${Number.parseFloat(r.lon)})"
-        >${escapeHtml(displayName)}</div>`;
+          onclick="selectCity('${displayName.replace(/'/g,"\\'")}', ${r.lat}, ${r.lon})"
+        >${displayName}</div>`;
       }).join('');
       dropdown.style.display = 'block';
     } catch {
@@ -954,17 +815,12 @@ async function doRegister() {
     fd.append('username',      document.getElementById('reg-username').value.trim());
     fd.append('email',         document.getElementById('reg-email').value.trim());
     fd.append('password',      document.getElementById('reg-password').value);
-    fd.append('genderIdentity', document.getElementById('reg-gender').value);
-    fd.append('lookingFor', document.getElementById('reg-looking-for').value);
-    fd.append('relationshipIntent', document.getElementById('reg-intent').value);
     fd.append('dateOfBirth',   document.getElementById('reg-dob').value);
     fd.append('timeOfBirth',   document.getElementById('reg-tob').value);
     fd.append('birthLocation', document.getElementById('reg-location').value.trim());
     fd.append('latitude',      lat);
     fd.append('longitude',     lng);
     fd.append('bio',           document.getElementById('reg-bio').value);
-    fd.append('profilePrompt', document.getElementById('reg-prompt').value);
-    fd.append('safetyConsent', document.getElementById('reg-safety').checked ? 'true' : 'false');
     const avatarFile = document.getElementById('reg-avatar').files[0];
     if (avatarFile) fd.append('avatar', avatarFile);
 
@@ -977,10 +833,11 @@ async function doRegister() {
     tagsDiv.innerHTML = [
       data.user.rashi, data.user.nakshatra + ' Nakshatra',
       data.user.gana + ' Gana', data.user.nadi + ' Nadi', data.user.yoni + ' Yoni',
-    ].map(t => `<span class="astro-tag-sm">${escapeHtml(t)}</span>`).join('');
+    ].map(t => `<span class="astro-tag-sm">${t}</span>`).join('');
     preview.style.display = '';
 
-    token = data.token || null;
+    token = data.token;
+    localStorage.setItem('ashta_token', token);
     currentUser = data.user;
     setTimeout(() => {
       closeAuth();
@@ -991,57 +848,6 @@ async function doRegister() {
     err.classList.add('show');
   } finally {
     btn.disabled = false; btn.textContent = 'Create account & see your chart';
-  }
-}
-
-async function resendVerification() {
-  if (!currentUser?.email) return;
-  try {
-    await api('POST', '/api/auth/resend-verification', { email: currentUser.email });
-    toast('Verification email sent');
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-async function requestPasswordReset() {
-  const email = window.prompt('Enter the email on your account');
-  if (!email) return;
-  try {
-    await api('POST', '/api/auth/forgot-password', { email });
-    toast('If that email exists, a reset link has been sent');
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-async function handleAuthActionsFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const verifyToken = params.get('verify');
-  const resetToken = params.get('reset');
-  if (!verifyToken && !resetToken) return;
-
-  try {
-    if (verifyToken) {
-      await api('POST', '/api/auth/verify-email', { token: verifyToken });
-      toast('Email verified');
-      if (currentUser) {
-        const data = await api('GET', '/api/auth/me');
-        if (data) currentUser = data.user;
-        updateVerificationBanner();
-      }
-    } else if (resetToken) {
-      const password = window.prompt('Enter your new password (minimum 8 characters)');
-      if (password) {
-        await api('POST', '/api/auth/reset-password', { token: resetToken, password });
-        toast('Password reset successfully');
-      }
-    }
-  } catch (e) {
-    toast(e.message);
-  } finally {
-    const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
-    window.history.replaceState({}, document.title, cleanUrl);
   }
 }
 
@@ -1057,7 +863,8 @@ async function doLogin() {
       password: document.getElementById('login-password').value,
     });
     if (!data) return;
-    token = data.token || null;
+    token = data.token;
+    localStorage.setItem('ashta_token', token);
     currentUser = data.user;
     closeAuth();
     afterLogin();
@@ -1070,41 +877,30 @@ async function doLogin() {
 }
 
 // ── After login ───────────────────────────────────────
-async function afterLogin() {
+function afterLogin() {
   goTo('app');
   renderSidebar();
-  updateVerificationBanner();
-  updateAdminVisibility();
-  await loadBlockedUsers();
   showSection('dashboard');
   loadNotifications();
   connectWebSocket();
   toast('Welcome back, ' + currentUser.username + ' ✦');
 }
 
-async function doLogout(silent = false) {
-  try {
-    await fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' });
-  } catch {}
+function doLogout() {
   token = null; currentUser = null;
-  blockedUserIds = new Set();
+  localStorage.removeItem('ashta_token');
   if (wsSocket) { wsSocket.disconnect(); wsSocket = null; }
   goTo('landing');
-  if (!silent) toast('Signed out');
+  toast('Signed out');
 }
 
 // ── Auto-login on page load ───────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  await handleAuthActionsFromUrl();
-  try {
-    const data = await api('GET', '/api/auth/me');
-    if (data) {
-      currentUser = data.user;
-      token = null;
-      afterLogin();
-    }
-  } catch {
-    token = null;
+  if (token) {
+    try {
+      const data = await api('GET', '/api/auth/me');
+      if (data) { currentUser = data.user; afterLogin(); }
+    } catch { localStorage.removeItem('ashta_token'); token = null; }
   }
 });
 
@@ -1113,28 +909,19 @@ function renderSidebar() {
   if (!currentUser) return;
   const u = currentUser;
   const avatarHtml = u.avatarURL
-    ? `<img src="${API}${encodeURI(u.avatarURL)}" alt="${escapeAttr(u.username)}" />`
-    : escapeHtml(u.username[0].toUpperCase());
+    ? `<img src="${API}${u.avatarURL}" alt="${u.username}" />`
+    : u.username[0].toUpperCase();
   document.getElementById('sidebar-profile').innerHTML = `
     <div class="sidebar-avatar">${avatarHtml}</div>
-    <div><div class="sidebar-name">${escapeHtml(u.username)}</div><div class="sidebar-sign">${escapeHtml(u.rashi)} · ${escapeHtml(u.nakshatra)}</div></div>`;
-}
-
-async function loadBlockedUsers() {
-  try {
-    const data = await api('GET', '/api/safety/blocked');
-    blockedUserIds = new Set((data?.blocked || []).map(row => row.userId));
-  } catch {
-    blockedUserIds = new Set();
-  }
+    <div><div class="sidebar-name">${u.username}</div><div class="sidebar-sign">${u.rashi} · ${u.nakshatra}</div></div>`;
 }
 
 // ── Avatar helper ─────────────────────────────────────
 function avatarEl(user, size = 44) {
   if (user.avatarURL) {
-    return `<img src="${API}${encodeURI(user.avatarURL)}" alt="${escapeAttr(user.username)}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;" />`;
+    return `<img src="${API}${user.avatarURL}" alt="${user.username}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;" />`;
   }
-  return escapeHtml(user.username[0].toUpperCase());
+  return user.username[0].toUpperCase();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────
@@ -1159,13 +946,10 @@ async function loadDashboard() {
 
     // Suggested
     const grid = document.getElementById('suggested-grid');
-    const suggestedUsers = users
-      .filter(u => u.id !== currentUser.id)
-      .sort((a, b) => alignsWithDatingIntent(b) - alignsWithDatingIntent(a))
-      .slice(0, 4);
+    const suggestedUsers = users.filter(u => u.id !== currentUser.id).slice(0, 4);
     grid.innerHTML = suggestedUsers.length
       ? suggestedUsers.map(profileCard).join('')
-      : '<div class="empty"><div class="empty-icon">✦</div><div class="empty-text">No 25+ compatibility profiles available yet. As more people join, this list will fill with stronger matches.</div></div>';
+      : '<div class="empty"><div class="empty-icon">✦</div><div class="empty-text">No profiles yet</div></div>';
 
     // Best matches
     const bml = document.getElementById('best-matches-list');
@@ -1174,13 +958,12 @@ async function loadDashboard() {
         <div class="best-match-item" style="cursor:pointer;" onclick="openProfile(${m.user.id})">
           <div class="bm-rank">${['①','②','③'][i]}</div>
           <div class="bm-info">
-            <div class="bm-name">${escapeHtml(m.user.username)}</div>
-            <div class="bm-sign">${escapeHtml(m.user.rashi)} · ${escapeHtml(m.user.nakshatra)}</div>
-            ${m.reasons?.[0] ? `<div class="bm-sign" style="margin-top:3px;">${escapeHtml(m.reasons[0].koota)}: ${escapeHtml(m.reasons[0].explanation)}</div>` : ''}
+            <div class="bm-name">${m.user.username}</div>
+            <div class="bm-sign">${m.user.rashi} · ${m.user.nakshatra}</div>
           </div>
-          <div class="bm-score">${escapeHtml(m.totalScore)}</div>
+          <div class="bm-score">${m.totalScore}</div>
         </div>`).join('')
-      : '<div class="empty" style="padding:1.5rem;"><div class="empty-text">No strong 25+ matches yet.</div></div>';
+      : '<div class="empty" style="padding:1.5rem;"><div class="empty-text">Get some readings done first!</div></div>';
   } catch (e) { console.error(e); }
 }
 
@@ -1195,21 +978,19 @@ async function loadBrowse() {
   grid.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
   try {
     const search   = document.getElementById('browse-search')?.value.trim()  || '';
-    const intent   = document.getElementById('browse-intent')?.value          || '';
     const rashi    = document.getElementById('browse-rashi')?.value           || '';
     const gana     = document.getElementById('browse-gana')?.value            || '';
     const minScore = document.getElementById('browse-minscore')?.value        || '';
     const params = new URLSearchParams();
-    if (intent)   params.set('intentFilter', intent);
     if (search)   params.set('search', search);
     if (rashi)    params.set('rashiFilter', rashi);
     if (gana)     params.set('ganaFilter', gana);
     if (minScore) params.set('minScore', minScore);
     const data = await api('GET', '/api/users?' + params.toString());
-    const users = (data?.users || []).sort((a, b) => alignsWithDatingIntent(b) - alignsWithDatingIntent(a));
+    const users = data?.users || [];
     grid.innerHTML = users.length
       ? users.map(profileCard).join('')
-      : '<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">No profiles currently meet your compatibility threshold and filters.</div></div>';
+      : '<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">No profiles match your filters.</div></div>';
   } catch (e) {
     grid.innerHTML = '<div class="empty">Failed to load profiles</div>';
   }
@@ -1221,30 +1002,25 @@ function profileCard(u) {
   const score = eval_ ? eval_.totalScore : '—';
   const label = eval_ ? eval_.label.toLowerCase() : '';
   const liked = u.liked;
-  const blocked = blockedUserIds.has(u.id);
-  const reasons = eval_?.reasons || [];
   const avatarContent = u.avatarURL
-    ? `<img src="${API}${encodeURI(u.avatarURL)}" alt="${escapeAttr(u.username)}" style="width:100%;height:100%;object-fit:cover;" />`
-    : escapeHtml(u.username[0].toUpperCase());
+    ? `<img src="${API}${u.avatarURL}" alt="${u.username}" style="width:100%;height:100%;object-fit:cover;" />`
+    : u.username[0].toUpperCase();
   return `
     <div class="profile-card" id="pcard-${u.id}">
       <div class="profile-avatar" onclick="openProfile(${u.id})">${avatarContent}</div>
       <div class="profile-info">
-        <div class="profile-name" onclick="openProfile(${u.id})">${escapeHtml(u.username)}</div>
-        ${u.profilePrompt ? `<div class="profile-astro" style="margin-top:4px;color:var(--ink-mid);">${escapeHtml(u.profilePrompt)}</div>` : ''}
-        <div class="profile-astro">${escapeHtml(displayAge(u))} · ${escapeHtml(displayLocation(u))}</div>
-        <div class="profile-astro" style="margin-top:2px;">${escapeHtml(titleizeEnum(u.relationshipIntent))} · Looking for ${escapeHtml(titleizeEnum(u.lookingFor))}</div>
-        <div class="profile-astro" style="margin-top:2px;">${escapeHtml(u.rashi)} · ${escapeHtml(u.nakshatra)}</div>
+        <div class="profile-name" onclick="openProfile(${u.id})">${u.username}</div>
+        <div class="profile-astro">${u.rashi} · ${u.nakshatra}</div>
+        <div class="profile-astro" style="margin-top:2px;">${u.gana} Gana · ${u.nadi} Nadi</div>
         <div class="profile-score-row">
-          ${eval_ ? `<span class="compat-badge ${label}">${escapeHtml(label.charAt(0).toUpperCase()+label.slice(1))}</span>` : '<span style="font-size:12px;color:var(--ink-soft);">No reading yet</span>'}
-          <div><span class="score-num">${escapeHtml(score)}</span><span class="score-denom">${eval_ ? '/36' : ''}</span></div>
+          ${eval_ ? `<span class="compat-badge ${label}">${label.charAt(0).toUpperCase()+label.slice(1)}</span>` : '<span style="font-size:12px;color:var(--ink-soft);">No reading yet</span>'}
+          <div><span class="score-num">${score}</span><span class="score-denom">${eval_ ? '/36' : ''}</span></div>
         </div>
-        ${reasons.length ? `<div class="profile-reasons">${reasons.slice(0, 2).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.koota)}</strong>: ${escapeHtml(reason.explanation)}</div>`).join('')}</div>` : ''}
         <div class="profile-actions">
-          <button class="like-btn ${liked?'liked':''}" id="likebtn-${u.id}" onclick="toggleLike(${u.id})" ${blocked ? 'disabled' : ''}>
-            ${blocked ? 'Blocked' : liked ? '♥ Liked' : '♡ Like'}
+          <button class="like-btn ${liked?'liked':''}" id="likebtn-${u.id}" onclick="toggleLike(${u.id})">
+            ${liked ? '♥ Liked' : '♡ Like'}
           </button>
-          <button class="req-btn ${blocked ? 'sent' : ''}" id="reqbtn-${u.id}" onclick="sendCompatRequest(${u.id})" ${blocked ? 'disabled' : ''}>${blocked ? 'Unavailable' : '✧ Reading'}</button>
+          <button class="req-btn" id="reqbtn-${u.id}" onclick="sendCompatRequest(${u.id})">✧ Reading</button>
         </div>
       </div>
     </div>`;
@@ -1264,20 +1040,20 @@ async function loadMatches() {
     const label = s => s >= 33 ? 'Excellent' : s >= 25 ? 'Good' : s >= 18 ? 'Average' : 'Poor';
     list.innerHTML = matches.map(m => {
       const avatarContent = m.OtherAvatar
-        ? `<img src="${API}${encodeURI(m.OtherAvatar)}" alt="${escapeAttr(m.OtherUsername)}" />`
-        : escapeHtml(m.OtherUsername[0].toUpperCase());
+        ? `<img src="${API}${m.OtherAvatar}" />`
+        : m.OtherUsername[0].toUpperCase();
       return `<div class="match-card" onclick="openCompat(${m.EvalID}, ${m.MatchID})">
         <div class="match-avatar">${avatarContent}</div>
         <div class="match-info">
-          <div class="match-name">${escapeHtml(m.OtherUsername)}</div>
-          <div class="match-meta">${escapeHtml(m.OtherRashi)} · ${escapeHtml(m.OtherNakshatra)}</div>
+          <div class="match-name">${m.OtherUsername}</div>
+          <div class="match-meta">${m.OtherRashi} · ${m.OtherNakshatra}</div>
           <div class="match-date">Matched ${new Date(m.MatchCreatedAt).toLocaleDateString()}</div>
         </div>
         <div class="match-score">
-          <div class="match-score-num">${escapeHtml(m.TotalScore)}</div>
-          <div class="match-score-label">${escapeHtml(m.MatchQualityLabel)}</div>
+          <div class="match-score-num">${m.TotalScore}</div>
+          <div class="match-score-label">${m.MatchQualityLabel}</div>
         </div>
-        <span class="compat-badge ${label(m.TotalScore).toLowerCase()}" style="margin-left:12px;">${escapeHtml(label(m.TotalScore))}</span>
+        <span class="compat-badge ${label(m.TotalScore).toLowerCase()}" style="margin-left:12px;">${label(m.TotalScore)}</span>
       </div>`;
     }).join('');
   } catch (e) {
@@ -1295,13 +1071,13 @@ async function openCompat(evalId, matchId) {
     const data = await api('GET', `/api/compatibility/${evalId}`);
     const e = data.eval;
     // User avatars
-    const av1 = e.User1Avatar ? `<img src="${API}${encodeURI(e.User1Avatar)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" alt="${escapeAttr(e.User1Username)}" />` : escapeHtml(e.User1Username[0]);
-    const av2 = e.User2Avatar ? `<img src="${API}${encodeURI(e.User2Avatar)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" alt="${escapeAttr(e.User2Username)}" />` : escapeHtml(e.User2Username[0]);
-    document.getElementById('compat-user1').innerHTML = `<div class="compat-user-avatar">${av1}</div><div class="compat-user-name">${escapeHtml(e.User1Username)}</div><div class="compat-user-sign">${escapeHtml(e.User1Rashi)} · ${escapeHtml(e.User1Nakshatra)}</div>`;
-    document.getElementById('compat-user2').innerHTML = `<div class="compat-user-avatar">${av2}</div><div class="compat-user-name">${escapeHtml(e.User2Username)}</div><div class="compat-user-sign">${escapeHtml(e.User2Rashi)} · ${escapeHtml(e.User2Nakshatra)}</div>`;
+    const av1 = e.User1Avatar ? `<img src="${API}${e.User1Avatar}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" />` : e.User1Username[0];
+    const av2 = e.User2Avatar ? `<img src="${API}${e.User2Avatar}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" />` : e.User2Username[0];
+    document.getElementById('compat-user1').innerHTML = `<div class="compat-user-avatar">${av1}</div><div class="compat-user-name">${e.User1Username}</div><div class="compat-user-sign">${e.User1Rashi} · ${e.User1Nakshatra}</div>`;
+    document.getElementById('compat-user2').innerHTML = `<div class="compat-user-avatar">${av2}</div><div class="compat-user-name">${e.User2Username}</div><div class="compat-user-sign">${e.User2Rashi} · ${e.User2Nakshatra}</div>`;
     document.getElementById('compat-score-big').textContent = e.TotalScore;
     const labelClass = e.MatchQualityLabel.toLowerCase();
-    document.getElementById('compat-label-badge').innerHTML = `<span class="compat-badge ${labelClass}" style="font-size:13px;padding:5px 16px;">${escapeHtml(e.MatchQualityLabel)}</span>`;
+    document.getElementById('compat-label-badge').innerHTML = `<span class="compat-badge ${labelClass}" style="font-size:13px;padding:5px 16px;">${e.MatchQualityLabel}</span>`;
 
     // Koota cards
     const KORDER = ['Varna','Vashya','Tara','Yoni','GrahaMaitri','Gana','Bhakoot','Nadi'];
@@ -1312,12 +1088,12 @@ async function openCompat(evalId, matchId) {
       const barColor = pct >= 75 ? '#2E6B2E' : pct >= 50 ? 'var(--gold)' : 'var(--accent-red)';
       return `<div class="koota-card">
         <div class="koota-card-header">
-          <div class="koota-card-name">${escapeHtml(type === 'GrahaMaitri' ? 'Graha Maitri' : type)}</div>
+          <div class="koota-card-name">${type === 'GrahaMaitri' ? 'Graha Maitri' : type}</div>
           <div class="koota-card-max">max ${k.MaxScore}</div>
         </div>
         <div class="koota-bar-bg"><div class="koota-bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
         <div class="koota-card-score">${k.ScoreValue}</div>
-        <div class="koota-explanation">${escapeHtml(k.ExplanationText || '')}</div>
+        <div class="koota-explanation">${k.ExplanationText || ''}</div>
       </div>`;
     }).join('');
   } catch (err) {
@@ -1327,22 +1103,7 @@ async function openCompat(evalId, matchId) {
 
 async function downloadCert() {
   if (!selectedEvalId) return;
-  try {
-    const res = await fetch(`${API}/api/compatibility/${selectedEvalId}/certificate`, { credentials: 'include' });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to download certificate');
-    }
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ashtakoota-certificate-${selectedEvalId}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    toast(err.message);
-  }
+  window.open(`${API}/api/compatibility/${selectedEvalId}/certificate?token=${encodeURIComponent(token)}`, '_blank');
 }
 
 function openChatFromCompat() {
@@ -1359,35 +1120,26 @@ async function openProfile(userId) {
     const u = data.user;
     const eval_ = data.compatEval;
     const liked  = data.liked;
-    const blocked = blockedUserIds.has(userId);
     const avatarContent = u.avatarURL
-      ? `<img src="${API}${encodeURI(u.avatarURL)}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;" alt="${escapeAttr(u.username)}" />`
-      : escapeHtml(u.username[0].toUpperCase());
+      ? `<img src="${API}${u.avatarURL}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;" />`
+      : u.username[0].toUpperCase();
     document.getElementById('profile-detail-header').innerHTML = `
       <div class="detail-avatar">${avatarContent}</div>
       <div class="detail-info">
-        <h3>${escapeHtml(u.username)}</h3>
-        <div class="detail-meta">${escapeHtml(displayAge(u))} · ${escapeHtml(displayLocation(u))}</div>
-        ${u.profilePrompt ? `<div style="font-size:14px;color:var(--ink-mid);margin-top:8px;">${escapeHtml(u.profilePrompt)}</div>` : ''}
-        ${u.bio ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:6px;">${escapeHtml(u.bio)}</div>` : ''}
+        <h3>${u.username}</h3>
+        <div class="detail-meta">${u.birthLocation} · Born ${new Date(u.dateOfBirth).toLocaleDateString()}</div>
+        ${u.bio ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:6px;">${u.bio}</div>` : ''}
         <div class="astro-tags" style="margin-top:10px;">
-          <span class="astro-tag">${escapeHtml(titleizeEnum(u.relationshipIntent))}</span>
-          <span class="astro-tag">Looking for ${escapeHtml(titleizeEnum(u.lookingFor))}</span>
-          <span class="astro-tag">${escapeHtml(u.rashi)}</span>
-          <span class="astro-tag">${escapeHtml(u.nakshatra)} Nakshatra</span>
-          <span class="astro-tag">${escapeHtml(u.gana)} Gana</span>
-          <span class="astro-tag">${escapeHtml(u.nadi)} Nadi</span>
-          <span class="astro-tag">${escapeHtml(u.yoni)} Yoni</span>
-          <span class="astro-tag">${escapeHtml(u.varna)}</span>
+          <span class="astro-tag">${u.rashi}</span>
+          <span class="astro-tag">${u.nakshatra} Nakshatra</span>
+          <span class="astro-tag">${u.gana} Gana</span>
+          <span class="astro-tag">${u.nadi} Nadi</span>
+          <span class="astro-tag">${u.yoni} Yoni</span>
+          <span class="astro-tag">${u.varna}</span>
         </div>
       </div>`;
 
     document.getElementById('profile-detail-astro').innerHTML = [
-      ['Age', displayAge(u)],
-      ['Region', displayLocation(u)],
-      ['Relationship intent', titleizeEnum(u.relationshipIntent)],
-      ['Looking for', titleizeEnum(u.lookingFor)],
-      ['Gender identity', titleizeEnum(u.genderIdentity)],
       ['Rashi (Moon sign)', u.rashi],
       ['Nakshatra', u.nakshatra],
       ['Ruling planet', u.rashiRuler],
@@ -1396,26 +1148,22 @@ async function openProfile(userId) {
       ['Yoni', u.yoni],
       ['Varna', u.varna],
       ['Vashya group', u.vashyaGroup],
-    ].map(([l, v]) => `<div class="detail-field"><div class="detail-field-label">${escapeHtml(l)}</div><div class="detail-field-value">${escapeHtml(v || '—')}</div></div>`).join('');
+      ['Birth location', u.birthLocation],
+    ].map(([l, v]) => `<div class="detail-field"><div class="detail-field-label">${l}</div><div class="detail-field-value">${v || '—'}</div></div>`).join('');
 
     document.getElementById('profile-detail-compat').innerHTML = eval_
       ? `<div class="score-circle" style="margin:0 auto 12px;">
            <div class="score-big">${eval_.totalScore}</div>
            <div class="score-small">/ 36</div>
          </div>
-         <span class="compat-badge ${eval_.label.toLowerCase()}" style="font-size:14px;padding:6px 16px;">${escapeHtml(eval_.label)}</span>
-         ${eval_.reasons?.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">${eval_.reasons.map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.koota)}</strong>: ${escapeHtml(reason.explanation)}</div>`).join('')}</div>` : ''}
-         ${eval_.evalId ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;" onclick="openCompat(${eval_.evalId})">View full breakdown →</div>` : '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;">Full breakdown unlocks once a reading is created.</div>'}`
+         <span class="compat-badge ${eval_.label.toLowerCase()}" style="font-size:14px;padding:6px 16px;">${eval_.label}</span>
+         <div style="font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;" onclick="openCompat(${eval_.evalId})">View full breakdown →</div>`
       : `<div style="font-size:13px;color:var(--ink-soft);padding:1rem 0;">No reading yet.<br>Request one to see compatibility.</div>`;
 
     const likeBtn = document.getElementById('profile-like-btn');
     likeBtn.className = 'like-btn' + (liked ? ' liked' : '');
-    likeBtn.textContent = blocked ? 'Blocked' : liked ? '♥ Liked' : '♡ Like';
-    likeBtn.disabled = blocked;
+    likeBtn.innerHTML = liked ? '♥ Liked' : '♡ Like';
     document.getElementById('profile-req-btn').setAttribute('data-uid', userId);
-    document.getElementById('profile-req-btn').disabled = blocked;
-    document.getElementById('profile-req-btn').textContent = blocked ? 'Unavailable' : '✧ Request Reading';
-    document.getElementById('profile-block-btn').textContent = blocked ? 'Unblock' : 'Block';
   } catch (e) {
     toast('Failed to load profile: ' + e.message);
   }
@@ -1426,32 +1174,18 @@ async function toggleLike(userId) {
   if (!userId) userId = selectedUserId;
   if (!userId) return;
   try {
-    const btn = document.getElementById(`likebtn-${userId}`);
-    const profileBtn = document.getElementById('profile-like-btn');
-    const alreadyLiked = btn?.classList.contains('liked') || (profileBtn && selectedUserId === userId && profileBtn.classList.contains('liked'));
-
-    if (alreadyLiked) {
-      await api('DELETE', `/api/likes/${userId}`);
-      if (btn) { btn.className = 'like-btn'; btn.textContent = '♡ Like'; }
-      if (profileBtn && selectedUserId === userId) {
-        profileBtn.className = 'like-btn';
-        profileBtn.textContent = '♡ Like';
-      }
-      toast('Like removed');
-      return;
-    }
-
     const data = await api('POST', `/api/likes/${userId}`);
     if (!data) return;
     if (data.match) {
       toast(`✦ It's a match! Score: ${data.match.totalScore}/36 — ${data.match.matchQualityLabel}`, 5000);
       loadDashboard();
-    } else if (data.duplicate) {
-      toast('Already liked');
     } else {
       toast('Liked! ✦');
     }
+    // Update button
+    const btn = document.getElementById(`likebtn-${userId}`);
     if (btn) { btn.className = 'like-btn liked'; btn.innerHTML = '♥ Liked'; }
+    const profileBtn = document.getElementById('profile-like-btn');
     if (profileBtn && selectedUserId === userId) {
       profileBtn.className = 'like-btn liked';
       profileBtn.innerHTML = '♥ Liked';
@@ -1466,47 +1200,12 @@ async function sendCompatRequest(userId) {
     userId = parseInt(btn?.getAttribute('data-uid'));
   }
   if (!userId) return;
-  if (blockedUserIds.has(userId)) return toast('This profile is unavailable');
   try {
     await api('POST', `/api/compat-requests/${userId}`);
     toast('Reading request sent — they have 48 hours to accept ✦');
     const btn = document.getElementById(`reqbtn-${userId}`);
     if (btn) { btn.classList.add('sent'); btn.textContent = '✧ Sent'; }
   } catch (e) { toast('Error: ' + e.message); }
-}
-
-async function toggleBlockSelectedUser() {
-  const userId = selectedUserId;
-  if (!userId) return;
-  try {
-    if (blockedUserIds.has(userId)) {
-      await api('DELETE', `/api/safety/block/${userId}`);
-      blockedUserIds.delete(userId);
-      toast('User unblocked');
-    } else {
-      await api('POST', `/api/safety/block/${userId}`, { reason: 'Blocked from profile' });
-      blockedUserIds.add(userId);
-      toast('User blocked');
-    }
-    loadBrowse();
-    if (selectedUserId === userId) openProfile(userId);
-  } catch (e) {
-    toast('Error: ' + e.message);
-  }
-}
-
-async function reportSelectedUser() {
-  const userId = selectedUserId;
-  if (!userId) return;
-  const category = window.prompt('Report category: spam, harassment, fake-profile, sexual-content, other');
-  if (!category) return;
-  const details = window.prompt('Optional details');
-  try {
-    await api('POST', '/api/safety/report', { reportedUserId: userId, category, details });
-    toast('Report submitted');
-  } catch (e) {
-    toast('Error: ' + e.message);
-  }
 }
 
 // ── REQUESTS ──────────────────────────────────────────
@@ -1531,14 +1230,11 @@ async function loadRequests() {
     incoming.innerHTML = inReqs.length ? inReqs.map(r => {
       const expires = new Date(r.ExpiresAt);
       const hoursLeft = Math.max(0, Math.round((expires - Date.now()) / 3600000));
-      const avatar = r.FromAvatar
-        ? `<img src="${API}${encodeURI(r.FromAvatar)}" alt="${escapeAttr(r.FromUsername)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;" />`
-        : escapeHtml(r.FromUsername[0]);
       return `<div class="request-card">
-        <div class="profile-avatar" style="width:44px;height:44px;font-size:18px;">${avatar}</div>
+        <div class="profile-avatar" style="width:44px;height:44px;font-size:18px;">${r.FromUsername[0]}</div>
         <div class="request-info">
-          <div class="request-name">${escapeHtml(r.FromUsername)}</div>
-          <div class="request-meta">${escapeHtml(r.FromRashi)} · ${escapeHtml(r.FromNakshatra)}</div>
+          <div class="request-name">${r.FromUsername}</div>
+          <div class="request-meta">${r.FromRashi} · ${r.FromNakshatra}</div>
           <div class="request-expires">Expires in ${hoursLeft}h</div>
         </div>
         <div class="request-actions">
@@ -1550,12 +1246,12 @@ async function loadRequests() {
 
     sent.innerHTML = sentReqs.length ? sentReqs.map(r => `
       <div class="request-card">
-        <div class="profile-avatar" style="width:44px;height:44px;font-size:18px;">${r.ToAvatar ? `<img src="${API}${encodeURI(r.ToAvatar)}" alt="${escapeAttr(r.ToUsername)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;" />` : escapeHtml(r.ToUsername[0])}</div>
+        <div class="profile-avatar" style="width:44px;height:44px;font-size:18px;">${r.ToUsername[0]}</div>
         <div class="request-info">
-          <div class="request-name">${escapeHtml(r.ToUsername)}</div>
-          <div class="request-meta">${escapeHtml(r.ToRashi)}</div>
+          <div class="request-name">${r.ToUsername}</div>
+          <div class="request-meta">${r.ToRashi}</div>
         </div>
-        <span class="compat-badge ${r.Status === 'pending' ? 'average' : r.Status === 'accepted' ? 'good' : 'poor'}">${escapeHtml(r.Status)}</span>
+        <span class="compat-badge ${r.Status === 'pending' ? 'average' : r.Status === 'accepted' ? 'good' : 'poor'}">${r.Status}</span>
       </div>`).join('')
       : '<div class="empty"><div class="empty-text">No sent requests</div></div>';
   } catch (e) { console.error(e); }
@@ -1586,60 +1282,14 @@ async function loadHistory() {
       return `<div class="history-item" onclick="openCompat(${h.EvalID})">
         <div class="history-date">${new Date(h.EvaluatedAtTimestamp).toLocaleDateString()}</div>
         <div style="flex:1;">
-          <div class="history-partner">${escapeHtml(h.OtherUsername)}</div>
-          <div class="history-sign">${escapeHtml(h.OtherRashi)}</div>
+          <div class="history-partner">${h.OtherUsername}</div>
+          <div class="history-sign">${h.OtherRashi}</div>
         </div>
-        <span class="compat-badge ${labelClass}">${escapeHtml(h.MatchQualityLabel)}</span>
-        <div class="history-score">${escapeHtml(h.TotalScore)}</div>
+        <span class="compat-badge ${labelClass}">${h.MatchQualityLabel}</span>
+        <div class="history-score">${h.TotalScore}</div>
       </div>`;
     }).join('') : '<div class="empty"><div class="empty-icon">◷</div><div class="empty-text">No readings yet — request one from Browse!</div></div>';
   } catch (e) { list.innerHTML = '<div class="empty">Failed to load history</div>'; }
-}
-
-async function loadAdminReports() {
-  const list = document.getElementById('admin-reports-list');
-  if (!currentUser?.isAdmin) {
-    list.innerHTML = '<div class="empty"><div class="empty-text">Admin access required</div></div>';
-    return;
-  }
-  list.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
-  try {
-    const status = document.getElementById('admin-status-filter')?.value || 'open';
-    const query = status === 'all' ? '' : `?status=${encodeURIComponent(status)}`;
-    const data = await api('GET', `/api/safety/admin/reports${query}`);
-    const reports = data?.reports || [];
-    list.innerHTML = reports.length ? reports.map(report => `
-      <div class="admin-report">
-        <div class="admin-report-top">
-          <div>
-            <div class="admin-report-title">${escapeHtml(report.Category)} report against ${escapeHtml(report.ReportedUsername)}</div>
-            <div class="admin-report-meta">From ${escapeHtml(report.ReporterUsername)} · ${new Date(report.CreatedAt).toLocaleString()} · status: ${escapeHtml(report.Status)}</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="moderateReport(${report.ReportID}, 'reviewed')">Mark reviewed</button>
-            <button class="btn-primary" style="font-size:12px;padding:6px 12px;" onclick="moderateReport(${report.ReportID}, 'resolved')">Resolve</button>
-            <button class="btn-danger" style="font-size:12px;padding:6px 12px;" onclick="moderateReport(${report.ReportID}, 'resolved', 'block-reported-user')">Resolve + block</button>
-          </div>
-        </div>
-        <div class="admin-report-meta">Reporter: ${escapeHtml(report.ReporterEmail)} · Reported: ${escapeHtml(report.ReportedEmail)}</div>
-        ${report.Details ? `<div class="admin-report-details">${escapeHtml(report.Details)}</div>` : ''}
-        ${report.actions?.length ? `<div class="admin-action-log">${report.actions.map(action => `<div class="admin-action-item"><strong>${escapeHtml(action.ActionType)}</strong> by ${escapeHtml(action.AdminUsername)} · ${new Date(action.CreatedAt).toLocaleString()}${action.Note ? ` · ${escapeHtml(action.Note)}` : ''}</div>`).join('')}</div>` : ''}
-      </div>
-    `).join('') : '<div class="empty"><div class="empty-text">No reports in this state</div></div>';
-  } catch (e) {
-    list.innerHTML = `<div class="empty"><div class="empty-text">${escapeHtml(e.message)}</div></div>`;
-  }
-}
-
-async function moderateReport(reportId, status, action) {
-  try {
-    const note = window.prompt('Optional staff note for audit history');
-    await api('PATCH', `/api/safety/admin/reports/${reportId}`, { status, action, note });
-    toast('Moderation action saved');
-    loadAdminReports();
-  } catch (e) {
-    toast(e.message);
-  }
 }
 
 // ── CHAT ──────────────────────────────────────────────
@@ -1650,13 +1300,13 @@ async function loadChatList() {
     const matches = data?.matches || [];
     convs.innerHTML = matches.length ? matches.map(m => {
       const avatarContent = m.OtherAvatar
-        ? `<img src="${API}${encodeURI(m.OtherAvatar)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="${escapeAttr(m.OtherUsername)}" />`
-        : escapeHtml(m.OtherUsername[0]);
-      return `<div class="chat-item ${activeChatMatchId === m.MatchID ? 'active' : ''}" onclick="openChat(${m.MatchID}, '${escapeJsString(m.OtherUsername)}', ${m.EvalID})">
+        ? `<img src="${API}${m.OtherAvatar}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />`
+        : m.OtherUsername[0];
+      return `<div class="chat-item ${activeChatMatchId === m.MatchID ? 'active' : ''}" onclick="openChat(${m.MatchID}, '${m.OtherUsername}', ${m.EvalID})">
         <div class="chat-item-avatar">${avatarContent}</div>
         <div>
-          <div class="chat-item-name">${escapeHtml(m.OtherUsername)}</div>
-          <div class="chat-item-score">${escapeHtml(m.TotalScore)}/36 · ${escapeHtml(m.MatchQualityLabel)}</div>
+          <div class="chat-item-name">${m.OtherUsername}</div>
+          <div class="chat-item-score">${m.TotalScore}/36 · ${m.MatchQualityLabel}</div>
         </div>
       </div>`;
     }).join('')
@@ -1674,12 +1324,12 @@ async function openChat(matchId, otherUsername, evalId) {
   const main = document.getElementById('chat-main');
   main.innerHTML = `
     <div class="chat-header">
-      <div style="font-size:15px;font-weight:500;">${escapeHtml(otherUsername)}</div>
+      <div style="font-size:15px;font-weight:500;">${otherUsername}</div>
       <button class="btn-ghost" style="margin-left:auto;font-size:12px;" onclick="openCompat(${evalId}, ${matchId})">View score ✦</button>
     </div>
     <div class="chat-messages" id="chat-msgs"><div class="empty"><div class="spinner"></div></div></div>
     <div class="chat-input-area">
-      <input class="chat-input" id="chat-input" placeholder="Message ${escapeAttr(otherUsername)}…" onkeydown="if(event.key==='Enter')sendMessage(${matchId})" />
+      <input class="chat-input" id="chat-input" placeholder="Message ${otherUsername}…" onkeydown="if(event.key==='Enter')sendMessage(${matchId})" />
       <button class="chat-send" onclick="sendMessage(${matchId})">Send</button>
     </div>`;
 
@@ -1707,7 +1357,7 @@ function renderMessages(messages) {
     const isMine = m.SenderID === currentUser.id;
     const time = new Date(m.SentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return `<div class="msg ${isMine ? 'mine' : 'theirs'}">
-      ${escapeHtml(m.Body)}
+      ${m.Body}
       <div class="msg-time">${time}</div>
     </div>`;
   }).join('');
@@ -1737,56 +1387,30 @@ function renderMyProfile() {
   const u = currentUser;
   if (!u) return;
   const avatarContent = u.avatarURL
-    ? `<img src="${API}${encodeURI(u.avatarURL)}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;" alt="${escapeAttr(u.username)}" />`
-    : escapeHtml(u.username[0].toUpperCase());
+    ? `<img src="${API}${u.avatarURL}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;" />`
+    : u.username[0].toUpperCase();
   document.getElementById('my-profile-content').innerHTML = `
     <div class="detail-header">
       <div class="detail-avatar">${avatarContent}</div>
       <div class="detail-info">
-        <h3>${escapeHtml(u.username)}</h3>
-        <div class="detail-meta">${escapeHtml(u.email)} · ${escapeHtml(u.birthLocation)}</div>
-        ${u.profilePrompt ? `<div style="font-size:14px;color:var(--ink-mid);margin-top:8px;">${escapeHtml(u.profilePrompt)}</div>` : ''}
-        ${u.bio ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:6px;">${escapeHtml(u.bio)}</div>` : ''}
+        <h3>${u.username}</h3>
+        <div class="detail-meta">${u.email} · ${u.birthLocation}</div>
+        ${u.bio ? `<div style="font-size:13px;color:var(--ink-soft);margin-top:6px;">${u.bio}</div>` : ''}
         <div class="astro-tags" style="margin-top:10px;">
-          <span class="astro-tag">${escapeHtml(titleizeEnum(u.relationshipIntent))}</span>
-          <span class="astro-tag">Looking for ${escapeHtml(titleizeEnum(u.lookingFor))}</span>
-          <span class="astro-tag">${escapeHtml(u.rashi)}</span>
-          <span class="astro-tag">${escapeHtml(u.nakshatra)} Nakshatra</span>
-          <span class="astro-tag">${escapeHtml(u.gana)} Gana</span>
-          <span class="astro-tag">${escapeHtml(u.nadi)} Nadi</span>
-          <span class="astro-tag">${escapeHtml(u.yoni)} Yoni</span>
-          <span class="astro-tag">${escapeHtml(u.varna)}</span>
+          <span class="astro-tag">${u.rashi}</span>
+          <span class="astro-tag">${u.nakshatra} Nakshatra</span>
+          <span class="astro-tag">${u.gana} Gana</span>
+          <span class="astro-tag">${u.nadi} Nadi</span>
+          <span class="astro-tag">${u.yoni} Yoni</span>
+          <span class="astro-tag">${u.varna}</span>
         </div>
       </div>
     </div>
     <div class="card" style="margin-top:1.5rem;">
-      <div class="card-title">Update dating profile</div>
-      <div class="form-row" style="max-width:700px;">
-        <div class="form-group">
-          <label>Relationship intent</label>
-          <select id="edit-intent">
-            <option value="marriage" ${u.relationshipIntent === 'marriage' ? 'selected' : ''}>Marriage-minded</option>
-            <option value="long-term" ${u.relationshipIntent === 'long-term' ? 'selected' : ''}>Long-term relationship</option>
-            <option value="serious-dating" ${u.relationshipIntent === 'serious-dating' ? 'selected' : ''}>Serious dating</option>
-            <option value="exploring" ${u.relationshipIntent === 'exploring' ? 'selected' : ''}>Exploring slowly</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Looking for</label>
-          <select id="edit-looking-for">
-            <option value="woman" ${u.lookingFor === 'woman' ? 'selected' : ''}>Women</option>
-            <option value="man" ${u.lookingFor === 'man' ? 'selected' : ''}>Men</option>
-            <option value="everyone" ${u.lookingFor === 'everyone' ? 'selected' : ''}>Everyone</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group" style="max-width:700px;">
-        <label>Profile headline</label>
-        <input type="text" id="edit-prompt" maxlength="160" value="${escapeAttr(u.profilePrompt || '')}" />
-      </div>
+      <div class="card-title">Update profile</div>
       <div class="form-group" style="max-width:400px;">
         <label>Bio</label>
-        <textarea id="edit-bio" rows="3" style="width:100%;padding:10px;border:.5px solid var(--border-strong);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--parchment);">${escapeHtml(u.bio || '')}</textarea>
+        <textarea id="edit-bio" rows="3" style="width:100%;padding:10px;border:.5px solid var(--border-strong);border-radius:8px;font-family:var(--font-body);font-size:14px;background:var(--parchment);">${u.bio || ''}</textarea>
       </div>
       <div class="form-group" style="max-width:400px;">
         <label>Profile Photo</label>
@@ -1799,13 +1423,7 @@ function renderMyProfile() {
 async function saveProfile() {
   const fd = new FormData();
   const bio = document.getElementById('edit-bio')?.value || '';
-  const profilePrompt = document.getElementById('edit-prompt')?.value || '';
-  const relationshipIntent = document.getElementById('edit-intent')?.value || '';
-  const lookingFor = document.getElementById('edit-looking-for')?.value || '';
   fd.append('bio', bio);
-  fd.append('profilePrompt', profilePrompt);
-  fd.append('relationshipIntent', relationshipIntent);
-  fd.append('lookingFor', lookingFor);
   const avatarFile = document.getElementById('edit-avatar')?.files[0];
   if (avatarFile) fd.append('avatar', avatarFile);
   try {
@@ -1841,12 +1459,11 @@ async function loadNotifications() {
       const text = n.Type === 'like' ? `${payload.fromUsername} liked your profile`
                  : n.Type === 'match' ? `You matched! Score: ${payload.score}/36 — ${payload.label}`
                  : n.Type === 'compat_request' ? `${payload.fromUsername} wants to check compatibility`
-                 : n.Type === 'message' ? `${payload.fromUsername} sent you a message`
                  : n.Type === 'request_accepted' ? `${payload.byUsername} accepted your request! Score: ${payload.totalScore}/36`
                  : 'New notification';
       return `<div class="notif-item ${n.IsRead ? '' : 'unread'}" onclick="handleNotifClick(${n.NotifID})">
-        <div class="notif-item-type">${escapeHtml(typeLabel)}</div>
-        <div class="notif-item-text">${escapeHtml(text)}</div>
+        <div class="notif-item-type">${typeLabel}</div>
+        <div class="notif-item-text">${text}</div>
         <div class="notif-item-time">${new Date(n.CreatedAt).toLocaleDateString()}</div>
       </div>`;
     }).join('') : '<div style="padding:16px;font-size:13px;color:var(--ink-soft);">No notifications yet</div>';
@@ -1864,25 +1481,25 @@ async function markAllRead() {
   loadNotifications();
 }
 
-async function handleNotifClick(notifId) {
+function handleNotifClick(notifId) {
   const n = _notifCache[notifId];
   if (!n) return;
-  try { await api('PATCH', `/api/notifications/${notifId}/read`); } catch {}
   const payload = typeof n.Payload === 'string' ? JSON.parse(n.Payload) : (n.Payload || {});
   if (n.Type === 'match' && payload.matchId) openCompat(payload.evalId || payload.matchId, payload.matchId);
   else if (n.Type === 'compat_request') showSection('requests');
   else if (n.Type === 'request_accepted' && payload.evalId) openCompat(payload.evalId);
-  else if (n.Type === 'message' && payload.matchId) showSection('chat');
   else if (n.Type === 'like') showSection('browse');
   document.getElementById('notif-panel').classList.remove('open');
 }
 
 // ── WEBSOCKET ─────────────────────────────────────────
 function connectWebSocket() {
-  if (!currentUser || wsSocket) return;
+  if (!token) return;
   // Load socket.io from CDN
-  const startSocket = () => {
-    wsSocket = io(API + '/chat', { withCredentials: true, auth: token ? { token } : {} });
+  const script = document.createElement('script');
+  script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
+  script.onload = () => {
+    wsSocket = io(API + '/chat', { auth: { token } });
     wsSocket.on('new_message', (msg) => {
       if (msg.MatchID === activeChatMatchId) {
         const container = document.getElementById('chat-msgs');
@@ -1891,7 +1508,7 @@ function connectWebSocket() {
           const time = new Date(msg.SentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           const div = document.createElement('div');
           div.className = 'msg ' + (isMine ? 'mine' : 'theirs');
-          div.innerHTML = `${escapeHtml(msg.Body)}<div class="msg-time">${time}</div>`;
+          div.innerHTML = `${msg.Body}<div class="msg-time">${time}</div>`;
           const emptyEl = container.querySelector('.empty');
           if (emptyEl) emptyEl.remove();
           container.appendChild(div);
@@ -1904,15 +1521,6 @@ function connectWebSocket() {
     });
     wsSocket.on('connect_error', (err) => console.warn('WS error:', err.message));
   };
-
-  if (window.io) {
-    startSocket();
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
-  script.onload = startSocket;
   document.head.appendChild(script);
 }
 
@@ -1924,6 +1532,8 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Certificate download uses token as query param — also support auth header approach
+// Backend should handle: GET /api/compatibility/:evalId/certificate?token=...
 </script>
 </body>
 </html>

@@ -2,8 +2,11 @@
 const router = require('express').Router();
 const db     = require('../config/db');
 const auth   = require('../middleware/auth');
+const requireVerified = require('../middleware/verified');
 const { calculateAshtakoota } = require('../utils/koota');
 const mailer = require('../utils/mailer');
+const { rateLimit } = require('../middleware/rateLimit');
+const { isBlockedEitherWay } = require('../utils/safety');
 
 async function loadUserForKoota(userId) {
   const [[u]] = await db.query(
@@ -28,11 +31,19 @@ async function notify(userId, type, payload) {
 }
 
 // ── POST /api/compat-requests/:targetId ──────────────────────────────────
-router.post('/:targetId', auth, async (req, res) => {
+router.post('/:targetId', auth, requireVerified, rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  scope: 'compat-request',
+  message: 'Too many reading requests. Please slow down.',
+}), async (req, res) => {
   try {
     const fromId = req.user.userId;
     const toId   = parseInt(req.params.targetId);
     if (fromId === toId) return res.status(400).json({ error: 'Cannot request yourself' });
+    if (await isBlockedEitherWay(fromId, toId)) {
+      return res.status(403).json({ error: 'This profile is unavailable' });
+    }
 
     // Check if already exists
     const [[existing]] = await db.query(
@@ -81,8 +92,13 @@ router.get('/', auth, async (req, res) => {
        JOIN RASHI r ON u.RashiID = r.RashiID
        JOIN NAKSHATRA n ON u.NakshatraID = n.NakshatraID
        WHERE cr.ToUserID = ? AND cr.Status = 'pending'
+         AND NOT EXISTS (
+           SELECT 1 FROM USER_BLOCK ub
+           WHERE (ub.BlockerUserID = ? AND ub.BlockedUserID = cr.FromUserID)
+              OR (ub.BlockedUserID = ? AND ub.BlockerUserID = cr.FromUserID)
+         )
        ORDER BY cr.CreatedAt DESC`,
-      [req.user.userId]
+      [req.user.userId, req.user.userId, req.user.userId]
     );
     return res.json({ requests: rows });
   } catch (err) {
@@ -99,8 +115,14 @@ router.get('/sent', auth, async (req, res) => {
        FROM COMPAT_REQUEST cr
        JOIN USER u ON cr.ToUserID = u.UserID
        JOIN RASHI r ON u.RashiID = r.RashiID
-       WHERE cr.FromUserID = ? ORDER BY cr.CreatedAt DESC`,
-      [req.user.userId]
+       WHERE cr.FromUserID = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM USER_BLOCK ub
+           WHERE (ub.BlockerUserID = ? AND ub.BlockedUserID = cr.ToUserID)
+              OR (ub.BlockedUserID = ? AND ub.BlockerUserID = cr.ToUserID)
+         )
+       ORDER BY cr.CreatedAt DESC`,
+      [req.user.userId, req.user.userId, req.user.userId]
     );
     return res.json({ sent: rows });
   } catch (err) {
@@ -109,7 +131,7 @@ router.get('/sent', auth, async (req, res) => {
 });
 
 // ── PATCH /api/compat-requests/:requestId — accept/decline ───────────────
-router.patch('/:requestId', auth, async (req, res) => {
+router.patch('/:requestId', auth, requireVerified, async (req, res) => {
   try {
     const { action } = req.body; // 'accepted' or 'declined'
     if (!['accepted','declined'].includes(action))
@@ -135,16 +157,28 @@ router.patch('/:requestId', auth, async (req, res) => {
         [cr.FromUserID, cr.ToUserID, cr.ToUserID, cr.FromUserID]
       );
       if (existing) {
-        evalData = { evalId: existing.EvalID, alreadyExists: true };
+        const [[existingEval]] = await db.query(
+          'SELECT EvalID, TotalScore, MatchQualityLabel FROM COMPATIBILITY_EVAL WHERE EvalID = ?',
+          [existing.EvalID]
+        );
+        evalData = {
+          evalId: existingEval.EvalID,
+          totalScore: existingEval.TotalScore,
+          matchQualityLabel: existingEval.MatchQualityLabel,
+          alreadyExists: true,
+        };
       } else {
-        const boy  = await loadUserForKoota(cr.FromUserID);
-        const girl = await loadUserForKoota(cr.ToUserID);
-        const { kootas, totalScore, matchQualityLabel } = calculateAshtakoota(boy, girl);
+        const [user1Id, user2Id] = cr.FromUserID < cr.ToUserID
+          ? [cr.FromUserID, cr.ToUserID]
+          : [cr.ToUserID, cr.FromUserID];
+        const user1 = await loadUserForKoota(user1Id);
+        const user2 = await loadUserForKoota(user2Id);
+        const { kootas, totalScore, matchQualityLabel } = calculateAshtakoota(user1, user2);
 
         const [evalResult] = await db.query(
           `INSERT INTO COMPATIBILITY_EVAL (TotalScore, MatchQualityLabel, EvalUser1ID, EvalUser2ID, RequestID)
            VALUES (?, ?, ?, ?, ?)`,
-          [totalScore, matchQualityLabel, cr.FromUserID, cr.ToUserID, cr.RequestID]
+          [totalScore, matchQualityLabel, user1Id, user2Id, cr.RequestID]
         );
         const evalId = evalResult.insertId;
 
