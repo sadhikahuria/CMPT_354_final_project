@@ -3,8 +3,11 @@ from dataclasses import asdict
 from flask import Blueprint, jsonify, request
 
 from ..services.auth_service import (
+    AuthenticationError,
+    LoginValidationError,
     RegistrationConflictError,
     RegistrationValidationError,
+    authenticate_user,
     register_user,
 )
 
@@ -33,4 +36,22 @@ def register():
             }
         ),
         201,
+    )
+
+
+@auth_blueprint.post("/login")
+def login():
+    try:
+        authenticated_user = authenticate_user(request.get_json(silent=True))
+    except LoginValidationError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 400
+    except AuthenticationError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 401
+
+    return jsonify(
+        {
+            "status": "ok",
+            "user": asdict(authenticated_user),
+            "note": "Session management will be added in a later step.",
+        }
     )

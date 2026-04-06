@@ -44,6 +44,12 @@ Current registration endpoint:
 POST /auth/register
 ```
 
+Current login endpoint:
+
+```text
+POST /auth/login
+```
+
 Temporary Phase 2 request body:
 
 ```json
@@ -60,3 +66,14 @@ Temporary Phase 2 request body:
 ```
 
 For this step, `rashi_id` and `nakshatra_id` are accepted directly so we can build and test the auth flow first. We will replace that with birth-data derivation in a later step.
+
+Current login request body:
+
+```json
+{
+  "email": "new_user@example.com",
+  "password": "securepass123"
+}
+```
+
+For this step, login only verifies credentials and returns a user summary. Session or token management will be added later.

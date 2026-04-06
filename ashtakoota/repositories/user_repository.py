@@ -14,6 +14,25 @@ def email_exists(cursor, email):
     return cursor.fetchone() is not None
 
 
+def find_user_by_email(cursor, email):
+    cursor.execute(
+        """
+        SELECT
+            UserID,
+            Username,
+            Email,
+            PasswordHash,
+            RashiID,
+            NakshatraID
+        FROM USER
+        WHERE Email = %s
+        LIMIT 1
+        """,
+        (email,),
+    )
+    return cursor.fetchone()
+
+
 def insert_user(cursor, registration):
     cursor.execute(
         """

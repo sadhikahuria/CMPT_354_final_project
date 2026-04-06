@@ -56,6 +56,35 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertEqual(response_payload["status"], "error")
         self.assertIn("email", response_payload["message"])
 
+    def test_login_accepts_valid_credentials(self):
+        user = self._create_test_user()
+        payload = {
+            "email": user["email"],
+            "password": user["password"],
+        }
+
+        response = self.client.post("/auth/login", json=payload)
+        response_payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_payload["status"], "ok")
+        self.assertEqual(response_payload["user"]["email"], user["email"])
+        self.assertEqual(response_payload["user"]["username"], user["username"])
+
+    def test_login_rejects_wrong_password(self):
+        user = self._create_test_user()
+        payload = {
+            "email": user["email"],
+            "password": "wrong-password",
+        }
+
+        response = self.client.post("/auth/login", json=payload)
+        response_payload = response.get_json()
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_payload["status"], "error")
+        self.assertEqual(response_payload["message"], "Invalid email or password.")
+
     def _fetch_user_by_email(self, email):
         with create_connection() as connection:
             with connection.cursor(dictionary=True) as cursor:
@@ -68,6 +97,23 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
                     (email,),
                 )
                 return cursor.fetchone()
+
+    def _create_test_user(self):
+        unique_suffix = uuid.uuid4().hex[:8]
+        payload = {
+            "username": f"test_user_{unique_suffix}",
+            "email": f"test_{unique_suffix}@example.com",
+            "password": "securepass123",
+            "date_of_birth": "2000-01-02",
+            "time_of_birth": "08:30:00",
+            "birth_location": "Surrey, BC",
+            "rashi_id": 1,
+            "nakshatra_id": 1,
+        }
+
+        response = self.client.post("/auth/register", json=payload)
+        self.assertEqual(response.status_code, 201)
+        return payload
 
     def _delete_test_users(self):
         with create_connection() as connection:
