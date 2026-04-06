@@ -52,6 +52,29 @@ def find_user_by_id(cursor, user_id):
     return cursor.fetchone()
 
 
+def list_discoverable_users(cursor, current_user_id):
+    cursor.execute(
+        """
+        SELECT
+            u.UserID,
+            u.Username,
+            u.DateOfBirth,
+            u.BirthLocation,
+            u.RashiID,
+            r.RashiName,
+            u.NakshatraID,
+            n.NakshatraName
+        FROM USER u
+        JOIN RASHI r ON r.RashiID = u.RashiID
+        JOIN NAKSHATRA n ON n.NakshatraID = u.NakshatraID
+        WHERE u.UserID <> %s
+        ORDER BY u.UserID
+        """,
+        (current_user_id,),
+    )
+    return cursor.fetchall()
+
+
 def insert_user(cursor, registration):
     cursor.execute(
         """

@@ -1,35 +1,16 @@
-import uuid
-
 from ashtakoota.database import create_connection
 from tests.base import AppIntegrationTestCase
+from tests.support import create_test_user, delete_test_users, login_test_user
 from werkzeug.security import check_password_hash
 
 
 class AuthRoutesTestCase(AppIntegrationTestCase):
     def tearDown(self):
-        self._delete_test_users()
+        delete_test_users()
         super().tearDown()
 
     def test_register_creates_user_with_hashed_password(self):
-        unique_suffix = uuid.uuid4().hex[:8]
-        payload = {
-            "username": f"test_user_{unique_suffix}",
-            "email": f"test_{unique_suffix}@example.com",
-            "password": "securepass123",
-            "date_of_birth": "2000-01-02",
-            "time_of_birth": "08:30:00",
-            "birth_location": "Surrey, BC",
-            "rashi_id": 1,
-            "nakshatra_id": 1,
-        }
-
-        response = self.client.post("/auth/register", json=payload)
-        response_payload = response.get_json()
-
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response_payload["status"], "created")
-        self.assertEqual(response_payload["user"]["username"], payload["username"])
-        self.assertEqual(response_payload["user"]["email"], payload["email"])
+        payload = create_test_user(self.client)
 
         stored_user = self._fetch_user_by_email(payload["email"])
 
@@ -57,7 +38,7 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertIn("email", response_payload["message"])
 
     def test_login_accepts_valid_credentials(self):
-        user = self._create_test_user()
+        user = create_test_user(self.client)
         payload = {
             "email": user["email"],
             "password": user["password"],
@@ -73,7 +54,7 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertIn("signed Flask session", response_payload["note"])
 
     def test_login_rejects_wrong_password(self):
-        user = self._create_test_user()
+        user = create_test_user(self.client)
         payload = {
             "email": user["email"],
             "password": "wrong-password",
@@ -95,15 +76,8 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
         self.assertEqual(response_payload["message"], "Authentication required.")
 
     def test_login_sets_session_and_logout_clears_it(self):
-        user = self._create_test_user()
-
-        login_response = self.client.post(
-            "/auth/login",
-            json={
-                "email": user["email"],
-                "password": user["password"],
-            },
-        )
+        user = create_test_user(self.client)
+        login_response = login_test_user(self.client, user)
         self.assertEqual(login_response.status_code, 200)
 
         me_response = self.client.get("/auth/me")
@@ -133,31 +107,6 @@ class AuthRoutesTestCase(AppIntegrationTestCase):
                     (email,),
                 )
                 return cursor.fetchone()
-
-    def _create_test_user(self):
-        unique_suffix = uuid.uuid4().hex[:8]
-        payload = {
-            "username": f"test_user_{unique_suffix}",
-            "email": f"test_{unique_suffix}@example.com",
-            "password": "securepass123",
-            "date_of_birth": "2000-01-02",
-            "time_of_birth": "08:30:00",
-            "birth_location": "Surrey, BC",
-            "rashi_id": 1,
-            "nakshatra_id": 1,
-        }
-
-        response = self.client.post("/auth/register", json=payload)
-        self.assertEqual(response.status_code, 201)
-        return payload
-
-    def _delete_test_users(self):
-        with create_connection() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM USER WHERE Email LIKE 'test_%@example.com'"
-                )
-            connection.commit()
 
 
 if __name__ == "__main__":

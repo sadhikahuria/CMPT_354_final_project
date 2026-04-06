@@ -58,6 +58,12 @@ GET /auth/me
 POST /auth/logout
 ```
 
+Current discovery endpoint:
+
+```text
+GET /users/discover
+```
+
 Temporary Phase 2 request body:
 
 ```json
@@ -87,3 +93,5 @@ Current login request body:
 For this step, login only verifies credentials and returns a user summary. Session or token management will be added later.
 
 This step now uses Flask's signed cookie session. Set `APP_SECRET_KEY` in `.env` so the whole team can run the same auth flow reliably on their own machines.
+
+`GET /users/discover` requires login and returns other users only. It excludes the signed-in user and derives each returned user's age from `DateOfBirth`.
