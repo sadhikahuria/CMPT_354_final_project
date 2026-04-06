@@ -47,7 +47,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok', ts: new Date() }));
 app.use('/api/auth',            require('./routes/auth'));
 app.use('/api/users',           require('./routes/users'));
 app.use('/api/likes',           require('./routes/social'));
-app.use('/api/matches',         require('./routes/social'));  // same router, handles both
+app.use('/api/matches',         require('./routes/matches'));  // same router, handles both
 app.use('/api/compat-requests', require('./routes/compatRequests'));
 app.use('/api/compatibility',   require('./routes/compatibility'));
 app.use('/api/chat',            require('./routes/chat'));
