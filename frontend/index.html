@@ -623,15 +623,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
   </div><!-- /app-layout -->
 </div><!-- /page-app -->
 
-<script src="/config.js"></script>
 <script>
 // ══════════════════════════════════════════════════════
-// CONFIG — runtime-configurable for Railway deployment
+// CONFIG — point this at your Railway backend URL
 // ══════════════════════════════════════════════════════
-const API = window.__ASHTAKOOTA_CONFIG__?.API_BASE_URL
-  || (window.location.hostname === 'localhost'
-    ? 'http://localhost:4000'
-    : window.location.origin);
+const API = window.location.hostname === 'localhost'
+  ? 'http://localhost:4000'
+  : 'https://your-backend.up.railway.app'; // ← UPDATE THIS after deploy
 
 // ── State ─────────────────────────────────────────────
 let token = localStorage.getItem('ashta_token');
@@ -1187,7 +1185,7 @@ async function loadHistory() {
   const list = document.getElementById('history-list');
   list.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
   try {
-    const data = await api('GET', `/api/compatibility/${currentUser.id}/history`);
+    const data = await api('GET', `/api/compatibility/history`);
     const history = data?.history || [];
     list.innerHTML = history.length ? history.map(h => {
       const labelClass = h.MatchQualityLabel.toLowerCase();
@@ -1350,6 +1348,8 @@ async function saveProfile() {
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────
+const _notifCache = {};  // store notifications by id to avoid HTML serialization bugs
+
 async function loadNotifications() {
   try {
     const data = await api('GET', '/api/notifications');
@@ -1359,16 +1359,19 @@ async function loadNotifications() {
     if (unread) { badge.textContent = unread; badge.classList.add('show'); }
     else badge.classList.remove('show');
 
+    // Cache for safe onclick access
+    notifs.forEach(n => { _notifCache[n.NotifID] = n; });
+
     const list = document.getElementById('notif-list');
     list.innerHTML = notifs.length ? notifs.map(n => {
-      const payload = n.Payload || {};
+      const payload = typeof n.Payload === 'string' ? JSON.parse(n.Payload) : (n.Payload || {});
       const typeLabel = { like: '♡ Like', match: '♥ Match', compat_request: '✧ Reading Request', request_accepted: '✦ Request Accepted', message: '✉ Message' }[n.Type] || n.Type;
       const text = n.Type === 'like' ? `${payload.fromUsername} liked your profile`
                  : n.Type === 'match' ? `You matched! Score: ${payload.score}/36 — ${payload.label}`
                  : n.Type === 'compat_request' ? `${payload.fromUsername} wants to check compatibility`
                  : n.Type === 'request_accepted' ? `${payload.byUsername} accepted your request! Score: ${payload.totalScore}/36`
                  : 'New notification';
-      return `<div class="notif-item ${n.IsRead ? '' : 'unread'}" onclick="handleNotifClick(${JSON.stringify(n).replace(/"/g,'&quot;')})">
+      return `<div class="notif-item ${n.IsRead ? '' : 'unread'}" onclick="handleNotifClick(${n.NotifID})">
         <div class="notif-item-type">${typeLabel}</div>
         <div class="notif-item-text">${text}</div>
         <div class="notif-item-time">${new Date(n.CreatedAt).toLocaleDateString()}</div>
@@ -1388,11 +1391,14 @@ async function markAllRead() {
   loadNotifications();
 }
 
-function handleNotifClick(n) {
-  const payload = n.Payload || {};
-  if (n.Type === 'match' && payload.evalId) openCompat(payload.evalId, payload.matchId);
+function handleNotifClick(notifId) {
+  const n = _notifCache[notifId];
+  if (!n) return;
+  const payload = typeof n.Payload === 'string' ? JSON.parse(n.Payload) : (n.Payload || {});
+  if (n.Type === 'match' && payload.matchId) openCompat(payload.evalId || payload.matchId, payload.matchId);
   else if (n.Type === 'compat_request') showSection('requests');
   else if (n.Type === 'request_accepted' && payload.evalId) openCompat(payload.evalId);
+  else if (n.Type === 'like') showSection('browse');
   document.getElementById('notif-panel').classList.remove('open');
 }
 

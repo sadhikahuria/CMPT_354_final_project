@@ -38,8 +38,10 @@ const RASHI_NAMES = [
 // ── Pure-math fallback (Swiss Ephemeris approximation) ───────────────────
 // Good to ~1° accuracy for dates 1900–2100
 function moonLongitudeFallback(dateStr, timeStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const [h, mi] = timeStr.split(':').map(Number);
+  const parts = (dateStr || '2000-01-01').split('-').map(Number);
+  const [y, m, d] = [parts[0] || 2000, parts[1] || 1, parts[2] || 1];
+  const timeParts = (timeStr || '12:00').split(':').map(Number);
+  const [h, mi] = [timeParts[0] || 12, timeParts[1] || 0];
   // Julian Day Number
   const A = Math.floor((14 - m) / 12);
   const Y = y + 4800 - A;
@@ -107,9 +109,12 @@ async function getBirthChart(dateStr, timeStr, lat, lng) {
   }
 
   // Fallback: pure-math ephemeris
-  const siderealL = moonLongitudeFallback(dateStr, timeStr);
-  const rashiIdx      = Math.floor(siderealL / 30);        // 0–11
-  const nakshatraIdx  = Math.floor(siderealL / (360 / 27)); // 0–26
+  let siderealL = moonLongitudeFallback(dateStr, timeStr);
+  // Guard against NaN from bad inputs
+  if (!isFinite(siderealL)) siderealL = 0;
+  siderealL = ((siderealL % 360) + 360) % 360; // ensure 0–360
+  const rashiIdx     = Math.min(Math.floor(siderealL / 30), 11);       // 0–11
+  const nakshatraIdx = Math.min(Math.floor(siderealL / (360 / 27)), 26); // 0–26
   return {
     rashiName:     RASHI_NAMES[rashiIdx],
     nakshatraName: NAKSHATRA_NAMES[nakshatraIdx],
