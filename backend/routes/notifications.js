@@ -20,17 +20,25 @@ router.get('/', auth, async (req, res) => {
 
 // ── PATCH /api/notifications/read-all ────────────────────────────────────
 router.patch('/read-all', auth, async (req, res) => {
-  await db.query('UPDATE NOTIFICATIONS SET IsRead = 1 WHERE UserID = ?', [req.user.userId]);
-  return res.json({ ok: true });
+  try {
+    await db.query('UPDATE NOTIFICATIONS SET IsRead = 1 WHERE UserID = ?', [req.user.userId]);
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 // ── PATCH /api/notifications/:id/read ────────────────────────────────────
 router.patch('/:id/read', auth, async (req, res) => {
-  await db.query(
-    'UPDATE NOTIFICATIONS SET IsRead = 1 WHERE NotifID = ? AND UserID = ?',
-    [req.params.id, req.user.userId]
-  );
-  return res.json({ ok: true });
+  try {
+    await db.query(
+      'UPDATE NOTIFICATIONS SET IsRead = 1 WHERE NotifID = ? AND UserID = ?',
+      [req.params.id, req.user.userId]
+    );
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

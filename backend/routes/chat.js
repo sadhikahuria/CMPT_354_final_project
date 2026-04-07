@@ -32,6 +32,12 @@ async function messageCount(matchId) {
   return Number(row?.count || 0);
 }
 
+function parseMatchId(value) {
+  const matchId = Number.parseInt(value, 10);
+  if (!Number.isInteger(matchId) || matchId <= 0) return null;
+  return matchId;
+}
+
 function validateMessageBody(body, existingCount) {
   const cleanBody = normalizePlainText(stripHtml(body || ''), 2000).trim();
   if (!cleanBody) return { error: 'Message body required' };
@@ -44,7 +50,8 @@ function validateMessageBody(body, existingCount) {
 // ── GET /api/chat/:matchId/messages ──────────────────────────────────────
 router.get('/:matchId/messages', auth, async (req, res) => {
   try {
-    const matchId = parseInt(req.params.matchId);
+    const matchId = parseMatchId(req.params.matchId);
+    if (!matchId) return res.status(400).json({ error: 'Invalid match id' });
     if (!(await verifyMatchAccess(matchId, req.user.userId))) {
       return res.status(403).json({ error: 'Not a participant in this match' });
     }
@@ -85,7 +92,8 @@ router.post('/:matchId/messages', auth, requireVerified, rateLimit({
   message: 'Too many messages. Please slow down.',
 }), async (req, res) => {
   try {
-    const matchId = parseInt(req.params.matchId);
+    const matchId = parseMatchId(req.params.matchId);
+    if (!matchId) return res.status(400).json({ error: 'Invalid match id' });
     if (!(await verifyMatchAccess(matchId, req.user.userId))) {
       return res.status(403).json({ error: 'Not a participant in this match' });
     }
@@ -139,38 +147,42 @@ module.exports.setupChat = function setupChat(io) {
 
     // User joins a match room
     socket.on('join_match', async ({ matchId }) => {
-      const ok = await verifyMatchAccess(matchId, userId);
+      const parsedMatchId = parseMatchId(matchId);
+      if (!parsedMatchId) return socket.emit('error', 'Invalid match id');
+      const ok = await verifyMatchAccess(parsedMatchId, userId);
       if (!ok) return socket.emit('error', 'Not a participant');
-      socket.join(`match:${matchId}`);
+      socket.join(`match:${parsedMatchId}`);
     });
 
     // Send a message
     socket.on('send_message', async ({ matchId, body }) => {
-      const ok = await verifyMatchAccess(matchId, userId);
+      const parsedMatchId = parseMatchId(matchId);
+      if (!parsedMatchId) return socket.emit('error', 'Invalid match id');
+      const ok = await verifyMatchAccess(parsedMatchId, userId);
       if (!ok) return socket.emit('error', 'Not a participant');
-      const otherUserId = await matchOtherUser(matchId, userId);
+      const otherUserId = await matchOtherUser(parsedMatchId, userId);
       if (otherUserId && await isBlockedEitherWay(userId, otherUserId)) {
         return socket.emit('error', 'Conversation unavailable');
       }
 
       try {
-        const existingCount = await messageCount(matchId);
+        const existingCount = await messageCount(parsedMatchId);
         const checked = validateMessageBody(body, existingCount);
         if (checked.error) return socket.emit('error', checked.error);
         const [result] = await db.query(
           'INSERT INTO MESSAGES (MatchID, SenderID, Body) VALUES (?, ?, ?)',
-          [matchId, userId, checked.body]
+          [parsedMatchId, userId, checked.body]
         );
         const [[msg]] = await db.query('SELECT * FROM MESSAGES WHERE MessageID = ?', [result.insertId]);
         if (otherUserId) {
           await db.query(
             'INSERT INTO NOTIFICATIONS (UserID, Type, Payload) VALUES (?, ?, ?)',
-            [otherUserId, 'message', JSON.stringify({ fromUserId: userId, fromUsername: socket.user.username, matchId })]
+            [otherUserId, 'message', JSON.stringify({ fromUserId: userId, fromUsername: socket.user.username, matchId: parsedMatchId })]
           );
         }
 
         // Broadcast to both participants in the room
-        chatNs.to(`match:${matchId}`).emit('new_message', {
+        chatNs.to(`match:${parsedMatchId}`).emit('new_message', {
           ...msg,
           senderUsername: socket.user.username,
         });

@@ -263,6 +263,7 @@ background-repeat:no-repeat;padding-right:42px;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--ink-soft);transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;}
 .sidebar-item:hover{background:rgba(49,33,37,.92);color:var(--ink);}
 .sidebar-item.active{background:rgba(110,15,31,.2);color:var(--ink);font-weight:500;border:1px solid rgba(213,154,133,.14);}
+.sidebar-badge{margin-left:auto;min-width:18px;height:18px;padding:0 6px;border-radius:999px;background:var(--deep-garnet);color:var(--champagne);font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;}
 .sidebar-icon{font-size:16px;width:20px;text-align:center;}
 .sidebar-divider{height:.5px;background:var(--border);margin:8px 0;}
 .sidebar-profile{padding:12px;border:.5px solid var(--border);border-radius:10px;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;}
@@ -1119,7 +1120,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         <button class="sidebar-item" data-section="matches" onclick="showSection('matches')"><span class="sidebar-icon">♥</span> Worth It</button>
         <button class="sidebar-item" data-section="chat" onclick="showSection('chat')"><span class="sidebar-icon">✉</span> Love Letters</button>
         <div class="sidebar-divider"></div>
-        <button class="sidebar-item" data-section="requests" onclick="showSection('requests')"><span class="sidebar-icon">✧</span> Requests</button>
+        <button class="sidebar-item" data-section="requests" onclick="showSection('requests')"><span class="sidebar-icon">✧</span> Requests <span class="sidebar-badge" id="req-badge"></span></button>
         <button class="sidebar-item" data-section="history" onclick="showSection('history')"><span class="sidebar-icon">◷</span> Your Receipts</button>
         <div class="sidebar-divider"></div>
         <button class="sidebar-item" data-section="my-profile" onclick="showSection('my-profile')"><span class="sidebar-icon">◉</span> My Profile</button>
@@ -1325,7 +1326,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 // CONFIG
 // ══════════════════════════════════════════════════════
 const API = window.__ASHTAKOOTA_CONFIG__?.API_BASE_URL
-  || (window.location.hostname === 'localhost'
+  || (['localhost', '127.0.0.1'].includes(window.location.hostname)
     ? 'http://localhost:4000'
     : window.location.origin);
 
@@ -1365,6 +1366,17 @@ function escapeJsString(value) {
     .replace(/'/g, "\\'")
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '');
+}
+
+function parseNotificationPayload(payload) {
+  if (!payload) return {};
+  if (typeof payload === 'object') return payload;
+  if (typeof payload !== 'string') return {};
+  try {
+    return JSON.parse(payload);
+  } catch {
+    return {};
+  }
 }
 
 function displayLocation(user) {
@@ -2484,8 +2496,10 @@ async function loadRequests() {
 
     // Badge
     const badge = document.getElementById('req-badge');
-    if (inReqs.length) { badge.style.display = ''; badge.textContent = inReqs.length; }
-    else badge.style.display = 'none';
+    if (badge) {
+      if (inReqs.length) { badge.style.display = ''; badge.textContent = inReqs.length; }
+      else badge.style.display = 'none';
+    }
 
     incoming.innerHTML = inReqs.length ? inReqs.map(r => {
       const expires = new Date(r.ExpiresAt);
@@ -2907,7 +2921,7 @@ async function loadNotifications() {
 
     const list = document.getElementById('notif-list');
     list.innerHTML = notifs.length ? notifs.map(n => {
-      const payload = typeof n.Payload === 'string' ? JSON.parse(n.Payload) : (n.Payload || {});
+      const payload = parseNotificationPayload(n.Payload);
       const typeLabel = { like: '♡ Like', match: '♥ Match', compat_request: '✧ Reading Request', request_accepted: '✦ Request Accepted', message: '✉ Love Letter' }[n.Type] || n.Type;
       const text = n.Type === 'like' ? `${payload.fromUsername} liked your profile`
                  : n.Type === 'match' ? `You matched! Score: ${payload.score}/36 — ${payload.label}`
@@ -2939,7 +2953,7 @@ async function handleNotifClick(notifId) {
   const n = _notifCache[notifId];
   if (!n) return;
   try { await api('PATCH', `/api/notifications/${notifId}/read`); } catch {}
-  const payload = typeof n.Payload === 'string' ? JSON.parse(n.Payload) : (n.Payload || {});
+  const payload = parseNotificationPayload(n.Payload);
   if (n.Type === 'match' && payload.matchId) openCompat(payload.evalId || payload.matchId, payload.matchId);
   else if (n.Type === 'compat_request') showSection('requests');
   else if (n.Type === 'request_accepted' && payload.evalId) openCompat(payload.evalId);

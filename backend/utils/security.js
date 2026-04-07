@@ -1,5 +1,3 @@
-const sharp = require('sharp');
-
 function normalizeEmail(email = '') {
   return String(email).trim().toLowerCase();
 }
@@ -57,6 +55,7 @@ function ageFromDate(dateValue) {
 }
 
 async function normalizeAvatar(filePath) {
+  const sharp = require('sharp');
   const image = sharp(filePath, { failOn: 'warning' });
   const meta = await image.metadata();
   if (!meta.width || !meta.height) throw new Error('Invalid image');

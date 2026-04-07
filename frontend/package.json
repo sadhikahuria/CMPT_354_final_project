@@ -5,7 +5,8 @@
   "description": "Railway frontend server for the Ashtakoota SPA",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:smoke": "node tests/smoke.test.js"
   },
   "dependencies": {
     "express": "^4.19.2"
