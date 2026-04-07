@@ -24,6 +24,23 @@ async function matchOtherUser(matchId, userId) {
   return row?.otherUserId || null;
 }
 
+async function messageCount(matchId) {
+  const [[row]] = await db.query(
+    'SELECT COUNT(*) AS count FROM MESSAGES WHERE MatchID = ?',
+    [matchId]
+  );
+  return Number(row?.count || 0);
+}
+
+function validateMessageBody(body, existingCount) {
+  const cleanBody = normalizePlainText(stripHtml(body || ''), 2000).trim();
+  if (!cleanBody) return { error: 'Message body required' };
+  if (existingCount === 0 && cleanBody.length < 60) {
+    return { error: 'Your first message should be a real Love Letter. Write at least 60 characters.' };
+  }
+  return { body: cleanBody };
+}
+
 // ── GET /api/chat/:matchId/messages ──────────────────────────────────────
 router.get('/:matchId/messages', auth, async (req, res) => {
   try {
@@ -46,6 +63,7 @@ router.get('/:matchId/messages', auth, async (req, res) => {
     params.push(limit);
 
     const [messages] = await db.query(query, params);
+    const totalMessages = await messageCount(matchId);
 
     // Mark messages from other user as read
     await db.query(
@@ -53,7 +71,7 @@ router.get('/:matchId/messages', auth, async (req, res) => {
       [matchId, req.user.userId]
     );
 
-    return res.json({ messages: messages.reverse() }); // chronological order
+    return res.json({ messages: messages.reverse(), totalMessages }); // chronological order
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -75,11 +93,12 @@ router.post('/:matchId/messages', auth, requireVerified, rateLimit({
     if (otherUserId && await isBlockedEitherWay(req.user.userId, otherUserId)) {
       return res.status(403).json({ error: 'This conversation is unavailable' });
     }
-    const body = normalizePlainText(stripHtml(req.body.body || ''), 2000);
-    if (!body || !body.trim()) return res.status(400).json({ error: 'Message body required' });
+    const existingCount = await messageCount(matchId);
+    const checked = validateMessageBody(req.body.body, existingCount);
+    if (checked.error) return res.status(400).json({ error: checked.error });
     const [result] = await db.query(
       'INSERT INTO MESSAGES (MatchID, SenderID, Body) VALUES (?, ?, ?)',
-      [matchId, req.user.userId, body.trim().slice(0, 2000)]
+      [matchId, req.user.userId, checked.body]
     );
     const [[msg]] = await db.query('SELECT * FROM MESSAGES WHERE MessageID = ?', [result.insertId]);
     if (otherUserId) {
@@ -127,8 +146,6 @@ module.exports.setupChat = function setupChat(io) {
 
     // Send a message
     socket.on('send_message', async ({ matchId, body }) => {
-      const cleanBody = normalizePlainText(stripHtml(body || ''), 2000);
-      if (!cleanBody) return;
       const ok = await verifyMatchAccess(matchId, userId);
       if (!ok) return socket.emit('error', 'Not a participant');
       const otherUserId = await matchOtherUser(matchId, userId);
@@ -137,9 +154,12 @@ module.exports.setupChat = function setupChat(io) {
       }
 
       try {
+        const existingCount = await messageCount(matchId);
+        const checked = validateMessageBody(body, existingCount);
+        if (checked.error) return socket.emit('error', checked.error);
         const [result] = await db.query(
           'INSERT INTO MESSAGES (MatchID, SenderID, Body) VALUES (?, ?, ?)',
-          [matchId, userId, cleanBody]
+          [matchId, userId, checked.body]
         );
         const [[msg]] = await db.query('SELECT * FROM MESSAGES WHERE MessageID = ?', [result.insertId]);
         if (otherUserId) {
