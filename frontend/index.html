@@ -60,7 +60,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 /* ── NAV ── */
 nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border-strong);padding:0 2rem;display:flex;align-items:center;gap:2rem;height:58px;}
 .nav-logo{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--ink);letter-spacing:.03em;cursor:pointer;flex-shrink:0;display:flex;align-items:center;}
-.nav-logo-word span{color:var(--rose-gold);}
+.nav-logo-word{color:var(--ink);}
 .nav-links{display:flex;gap:.25rem;flex:1;}
 .nav-context{flex:1;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
 .nav-link{font-size:13px;font-weight:400;color:var(--ink-soft);padding:6px 12px;border-radius:6px;cursor:pointer;border:none;background:none;transition:background .15s,color .15s;letter-spacing:.01em;}
@@ -119,6 +119,17 @@ nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-fi
 .teaser-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
 .teaser-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px;}
 .teaser-copy{font-size:13px;line-height:1.7;color:var(--ink-soft);}
+.public-section{position:relative;padding:6.5rem 2rem;border-top:1px solid rgba(213,154,133,.12);}
+.public-section.noir{background:linear-gradient(180deg, rgba(18,11,13,1) 0%, rgba(15,9,11,1) 100%);}
+.public-section.ink{background:linear-gradient(180deg, rgba(34,24,27,.98) 0%, rgba(22,16,18,1) 100%);}
+.public-section-inner{max-width:1100px;margin:0 auto;}
+.public-grid-two{display:grid;grid-template-columns:1.02fr .98fr;gap:1.75rem;align-items:start;}
+.public-stack{display:grid;gap:16px;}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.public-footer{border-top:1px solid rgba(213,154,133,.12);background:rgba(12,8,9,.96);padding:1.6rem 2rem 2rem;}
+.public-footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.public-footer-brand{font-family:var(--font-display);font-size:24px;color:var(--ink);}
+.public-footer-copy{font-size:13px;color:var(--ink-soft);max-width:520px;}
 .koota-preview-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;animation:slideIn .5s ease both;box-shadow:0 12px 28px rgba(24,21,19,.05);}
 .koota-preview-card:nth-child(1){animation-delay:.1s;}
 .koota-preview-card:nth-child(2){animation-delay:.2s;}
@@ -134,7 +145,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-fi
 .features-section{background:linear-gradient(180deg, rgba(34,24,27,.99), rgba(22,16,18,1));border-top:1px solid rgba(213,154,133,.12);padding:6.75rem 2rem;}
 .features-inner{max-width:1000px;margin:0 auto;}
 .section-label{position:relative;display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:500;letter-spacing:.12em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.9rem;}
-.section-label::before,.section-label::after{content:'';width:16px;height:10px;opacity:.54;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'%3E%3Cg fill='none' stroke='%23D59A85' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 14c4 0 6-2 8-6 2 4 4 6 8 6'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;}
 .section-title{font-family:var(--font-display);font-size:44px;font-weight:600;color:var(--ink);margin-bottom:1.15rem;line-height:.98;}
 .section-copy{font-size:16px;line-height:1.95;color:var(--ink-soft);max-width:760px;margin-bottom:3.25rem;}
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
@@ -196,11 +206,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-fi
 .auth-side-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--border-strong);}
 .auth-side-card strong{display:block;color:var(--ink);font-size:14px;margin-bottom:4px;}
 .auth-side-card span{display:block;color:var(--ink-soft);font-size:13px;line-height:1.7;}
-.auth-tabs{display:flex;gap:10px;margin:0 0 1.25rem;}
-.auth-tab{flex:1;border:1px solid var(--border-strong);background:rgba(34,24,27,.8);color:var(--ink-mid);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
-.auth-tab.active{background:rgba(110,15,31,.22);color:var(--ink);border-color:rgba(213,154,133,.24);}
 .auth-back{margin-bottom:1rem;display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);cursor:pointer;font-size:13px;}
 .auth-back:hover{color:var(--ink);}
+.auth-mode-kicker{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.85rem;}
+.auth-mode-kicker::before{content:'';width:18px;height:1px;background:rgba(213,154,133,.42);}
+.auth-shell[data-auth-mode="login"] .auth-panel{max-width:520px;}
+.auth-shell[data-auth-mode="login"] .auth-layout{grid-template-columns:minmax(0,.95fr) minmax(420px,.65fr);}
+.auth-shell[data-auth-mode="signup"] .auth-layout{grid-template-columns:minmax(0,.88fr) minmax(430px,.72fr);}
 .modal-sub{font-size:13px;color:var(--ink-soft);margin-bottom:1.5rem;}
 .form-group{margin-bottom:1rem;}
 .form-group label{display:block;font-size:12px;font-weight:500;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:.4rem;text-transform:uppercase;}
@@ -481,6 +493,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .hero-text h1{max-width:none;}
   .hero-visual{display:none;}
   .teaser-strip{grid-template-columns:1fr;padding:0 1.25rem 2.5rem;}
+  .trust-grid{grid-template-columns:1fr;}
+  .public-grid-two{grid-template-columns:1fr;}
   .app-layout{grid-template-columns:1fr;}.sidebar{display:none;}
   .features-grid{grid-template-columns:1fr;}
   .difference-inner{grid-template-columns:1fr;}
@@ -509,6 +523,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .hero{grid-template-columns:1fr;gap:2.35rem;padding:4rem 1.25rem 4.5rem;}
   .hero-visual{width:100%;}
   .teaser-strip{grid-template-columns:1fr;padding:0 1.25rem 2.5rem;}
+  .public-section{padding:5rem 1.25rem;}
   .cta-inner{flex-direction:column;align-items:flex-start;}
   .cta-actions{width:100%;}
   .cta-actions .btn-lg{width:100%;text-align:center;}
@@ -543,10 +558,10 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 <!-- ══════════════════════════════════════════════ -->
 <!-- LANDING PAGE -->
 <!-- ══════════════════════════════════════════════ -->
-<div class="page active" id="page-landing">
+<div class="page" id="page-landing">
   <div class="landing-shell">
     <nav>
-      <div class="nav-logo" onclick="goTo('landing')"><span class="nav-logo-word">Ashta<span>koota</span></span></div>
+      <div class="nav-logo" onclick="goTo('landing')"><span class="nav-logo-word">Ashtakoota</span></div>
       <div class="nav-links">
         <button class="nav-link" onclick="goTo('how')">How it works</button>
       </div>
@@ -604,20 +619,116 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       </div>
     </div>
 
-    <div class="teaser-strip">
-      <div class="teaser-card">
-        <div class="teaser-title">No more “what are we?” limbo</div>
-        <div class="teaser-copy">Intent sits on the profile. You are not auditioning for someone else's ambiguity.</div>
+    <section class="public-section ink">
+      <div class="public-section-inner">
+        <div class="section-label">Why this is different</div>
+        <div class="section-title">Built for people who want direction, not just dopamine.</div>
+        <div class="section-copy">Ashtakoota does not pretend volume is the same thing as value. It slows the pace, puts intent on the profile, and makes compatibility easier to understand before you burn time on a connection that never had shape.</div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-num">01</div>
+            <div class="feature-title">Intent before intrigue</div>
+            <div class="feature-desc">Profiles tell you what someone is here for before you start projecting your own meaning onto mixed signals.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">02</div>
+            <div class="feature-title">Compatibility with context</div>
+            <div class="feature-desc">The reading is not random mysticism. It is a structured system translated into modern relationship language.</div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-num">03</div>
+            <div class="feature-title">Slower, more deliberate contact</div>
+            <div class="feature-desc">Even the first message asks for more care than “hey”, so the app filters out a lot of low-effort behavior early.</div>
+          </div>
+        </div>
       </div>
-      <div class="teaser-card">
-        <div class="teaser-title">A broader dating lens</div>
-        <div class="teaser-copy">Rooted in Vedic compatibility, but built for anyone who wants more clarity than the swipe market offers.</div>
+    </section>
+
+    <section class="public-section noir">
+      <div class="public-section-inner">
+        <div class="section-label">Why people stay</div>
+        <div class="section-title">It makes dating feel calmer.</div>
+        <div class="section-copy">You spend less time decoding, less time second-guessing, and more time deciding whether the person in front of you is actually worth taking seriously.</div>
+        <div class="trust-grid">
+          <div class="teaser-card">
+            <div class="teaser-title">Clarity reduces noise</div>
+            <div class="teaser-copy">Profiles carry relationship intent, so ambiguity is no longer the default mood of the app.</div>
+          </div>
+          <div class="teaser-card">
+            <div class="teaser-title">Better filtering, earlier</div>
+            <div class="teaser-copy">Compatibility context appears before you overinvest, which changes who feels worth a second look.</div>
+          </div>
+          <div class="teaser-card">
+            <div class="teaser-title">A wider lens than chemistry</div>
+            <div class="teaser-copy">Attraction still matters. It just no longer has to do all the work by itself.</div>
+          </div>
+        </div>
       </div>
-      <div class="teaser-card">
-        <div class="teaser-title">More context, less chaos</div>
-        <div class="teaser-copy">If you have ever mistaken attention for alignment, this app was made for exactly that problem.</div>
+    </section>
+
+    <section class="public-section ink">
+      <div class="public-section-inner public-grid-two">
+        <div>
+          <div class="section-label">How it works</div>
+          <div class="section-title">Simple flow. Less chaos.</div>
+          <div class="section-copy">Create a serious profile, add your birth details once, and browse people with far more context than a swipe stack gives you. When the interest is mutual, the deeper reading becomes available.</div>
+          <div class="cta-actions">
+            <button class="btn-lg primary" onclick="openAuth('register')">Get started</button>
+            <button class="btn-lg outline" onclick="goTo('how')">See the full walkthrough</button>
+          </div>
+        </div>
+        <div class="public-stack">
+          <div class="story-step">
+            <div class="story-step-num">1</div>
+            <div>
+              <div class="story-step-title">Create a profile with intent</div>
+              <div class="story-step-copy">Say what you want, who you want to meet, and what kind of connection you are genuinely open to.</div>
+            </div>
+          </div>
+          <div class="story-step">
+            <div class="story-step-num">2</div>
+            <div>
+              <div class="story-step-title">Let the app derive the signals</div>
+              <div class="story-step-copy">Birth details are used once so compatibility markers can be translated into plain-English relationship cues.</div>
+            </div>
+          </div>
+          <div class="story-step">
+            <div class="story-step-num">3</div>
+            <div>
+              <div class="story-step-title">Only go deeper when it matters</div>
+              <div class="story-step-copy">The strongest detail reveals itself after interest becomes mutual instead of overwhelming the first impression.</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="public-section noir">
+      <div class="public-section-inner public-grid-two">
+        <div class="difference-card">
+          <div class="section-label">Compatibility, explained</div>
+          <div class="section-title">Eight signals. Human meaning first.</div>
+          <div class="section-copy" style="margin-bottom:0;">You do not need to know the traditional framework before the product becomes useful. Ashtakoota translates compatibility into shared pace, long-term harmony, emotional support, values fit, and other relationship signals that are easier to understand in real life.</div>
+        </div>
+        <div class="public-stack">
+          <div class="signal-card">
+            <div class="signal-tag">Signal example</div>
+            <div class="signal-name">Shared pace</div>
+            <div class="signal-copy">How naturally two people move through closeness, stress, and everyday emotional rhythm.</div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-tag">Signal example</div>
+            <div class="signal-name">Long-term harmony</div>
+            <div class="signal-copy">Whether the connection has a steadier emotional foundation over time instead of relying on short-term chemistry alone.</div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-tag">Inspired by</div>
+            <div class="signal-name">Ashtakoota tradition</div>
+            <div class="signal-copy">Culturally rooted, translated for a modern dating product, and designed to feel useful even if this is your first exposure to the framework.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="cta-band">
       <div class="cta-inner">
@@ -632,13 +743,20 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         </div>
       </div>
     </div>
+
+    <footer class="public-footer">
+      <div class="public-footer-inner">
+        <div class="public-footer-brand">Ashtakoota</div>
+        <div class="public-footer-copy">A slower dating product for people who want more clarity than swipe culture usually offers.</div>
+      </div>
+    </footer>
   </div>
 </div>
 
 <div class="page" id="page-how">
   <div class="how-shell">
     <nav>
-      <div class="nav-logo" onclick="goTo('landing')"><span class="nav-logo-word">Ashta<span>koota</span></span></div>
+      <div class="nav-logo" onclick="goTo('landing')"><span class="nav-logo-word">Ashtakoota</span></div>
       <div class="nav-links">
         <button class="nav-link" onclick="goTo('landing')">Back to landing</button>
       </div>
@@ -761,6 +879,12 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         </div>
       </div>
     </div>
+    <footer class="public-footer">
+      <div class="public-footer-inner">
+        <div class="public-footer-brand">Ashtakoota</div>
+        <div class="public-footer-copy">Compatibility with context, translated into modern relationship language.</div>
+      </div>
+    </footer>
   </div>
 </div>
 
@@ -768,9 +892,9 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 <!-- AUTH PAGE -->
 <!-- ══════════════════════════════════════════════ -->
 <div class="page" id="page-auth">
-  <div class="auth-shell">
+  <div class="auth-shell" id="auth-shell" data-auth-mode="login">
     <nav>
-      <div class="nav-logo" onclick="goTo(lastPublicPage || 'landing')"><span class="nav-logo-word">Ashta<span>koota</span></span></div>
+      <div class="nav-logo" onclick="goTo(lastPublicPage || 'landing')"><span class="nav-logo-word">Ashtakoota</span></div>
       <div class="nav-links">
         <button class="nav-link" onclick="goTo('landing')">Back to landing</button>
         <button class="nav-link" onclick="goTo('how')">How it works</button>
@@ -779,30 +903,43 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
     <div class="auth-wrap">
       <div class="auth-layout">
         <div class="auth-side">
-          <div class="section-label">Get started</div>
-          <h1>Build something more intentional than another swipe.</h1>
-          <p>Keep the path focused. Sign in if you already have an account, or create a profile that carries intent, context, and enough substance to be taken seriously.</p>
-          <div class="auth-side-stack">
-            <div class="auth-side-card">
-              <strong>One clear next step</strong>
-              <span>No dashboard noise here. Just authentication and profile creation.</span>
+          <div id="auth-side-login">
+            <div class="auth-mode-kicker">Sign in</div>
+            <h1>Pick up where the signal left off.</h1>
+            <p>Keep this page focused. Sign in, verify your account if needed, and get back to the app without the landing page noise wrapped around it.</p>
+            <div class="auth-side-stack">
+              <div class="auth-side-card">
+                <strong>Minimal by design</strong>
+                <span>This route is only for returning members. No registration fields, no dashboard clutter, no product dump.</span>
+              </div>
+              <div class="auth-side-card">
+                <strong>Email still matters</strong>
+                <span>Verification unlocks likes, requests, Love Letters, and moderation flows after you sign in.</span>
+              </div>
             </div>
-            <div class="auth-side-card">
-              <strong>Email unlocks access</strong>
-              <span>Verify your inbox after signup to unlock likes, requests, Love Letters, and reporting.</span>
-            </div>
-            <div class="auth-side-card">
-              <strong>Profiles before performance</strong>
-              <span>Intent, photos, and compatibility context lead before the conversation starts.</span>
+          </div>
+          <div id="auth-side-signup" style="display:none;">
+            <div class="auth-mode-kicker">Create your profile</div>
+            <h1>Build something more intentional than another swipe.</h1>
+            <p>This is a private setup flow, not a marketing page. Create the full profile once, add the details the backend needs, and move directly into the app.</p>
+            <div class="auth-side-stack">
+              <div class="auth-side-card">
+                <strong>Full profile setup lives here</strong>
+                <span>Photos, intent, birth details, and profile story all belong on this route, not on the public landing page.</span>
+              </div>
+              <div class="auth-side-card">
+                <strong>Email unlocks access</strong>
+                <span>Verify your inbox after signup to unlock likes, requests, Love Letters, and reporting.</span>
+              </div>
+              <div class="auth-side-card">
+                <strong>Profiles before performance</strong>
+                <span>Intent, photos, and compatibility context lead before the conversation starts.</span>
+              </div>
             </div>
           </div>
         </div>
         <div class="auth-panel">
           <div class="auth-back" onclick="goTo(lastPublicPage || 'landing')">← Back</div>
-          <div class="auth-tabs">
-            <button class="auth-tab active" id="auth-tab-login" onclick="switchAuth('login')">Sign in</button>
-            <button class="auth-tab" id="auth-tab-register" onclick="switchAuth('register')">Create account</button>
-          </div>
 
           <!-- LOGIN -->
           <div id="auth-login">
@@ -813,11 +950,11 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••" /></div>
       <button class="form-btn" id="login-btn" onclick="doLogin()">Sign in</button>
       <p class="form-switch"><a onclick="requestPasswordReset()">Forgot password?</a></p>
-      <p class="form-switch">New here? <a onclick="switchAuth('register')">Create account</a></p>
+      <p class="form-switch">New here? <a onclick="openAuth('register')">Create account</a></p>
     </div>
 
           <!-- REGISTER -->
-          <div id="auth-register" style="display:none;">
+          <div id="auth-register">
       <h2>Build a profile worth reading</h2>
       <p class="modal-sub">This is where you trade swipe-bait for substance. We use your birth details for compatibility, but your intent and character still lead.</p>
       <div class="form-error" id="register-error"></div>
@@ -889,7 +1026,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         </div>
       </div>
       <button class="form-btn" id="register-btn" onclick="doRegister()">Start my profile &amp; see my chart</button>
-      <p class="form-switch">Already have an account? <a onclick="switchAuth('login')">Sign in</a></p>
+      <p class="form-switch">Already have an account? <a onclick="openAuth('login')">Sign in</a></p>
           </div>
         </div>
       </div>
@@ -902,7 +1039,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 <!-- ══════════════════════════════════════════════ -->
 <div class="page" id="page-app">
   <nav>
-    <div class="nav-logo" onclick="showSection('dashboard')"><span class="nav-logo-word">Ashta<span>koota</span></span></div>
+    <div class="nav-logo" onclick="showSection('dashboard')"><span class="nav-logo-word">Ashtakoota</span></div>
     <div class="nav-context" id="nav-context">Overview</div>
     <div class="nav-right">
       <div class="notif-dot">
@@ -1093,7 +1230,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 <div class="page" id="page-admin">
   <div class="admin-shell">
     <nav>
-      <div class="nav-logo" onclick="goTo('app')"><span class="nav-logo-word">Ashta<span>koota</span></span></div>
+      <div class="nav-logo" onclick="goTo('app')"><span class="nav-logo-word">Ashtakoota</span></div>
       <div class="nav-links">
         <button class="nav-link" onclick="goTo('app')">Back to app</button>
       </div>
@@ -1134,6 +1271,7 @@ let currentUser = null;
 let currentSection = 'dashboard';
 let previousSection = null;
 let lastPublicPage = 'landing';
+let lastPublicPath = '/';
 let selectedEvalId = null;
 let selectedUserId = null;
 let selectedMatchId = null;
@@ -1330,11 +1468,94 @@ function toast(msg, duration = 3000) {
 }
 
 // ── Page routing ──────────────────────────────────────
-function goTo(pageId) {
+const PAGE_PATHS = {
+  landing: '/',
+  how: '/how',
+  auth: '/login',
+  login: '/login',
+  signup: '/signup',
+  app: '/app',
+  admin: '/admin',
+};
+
+function normalizePath(pathname) {
+  const base = pathname && pathname !== '/' ? pathname.replace(/\/+$/, '') : '/';
+  return PAGE_PATHS[base.slice(1)] || (Object.values(PAGE_PATHS).includes(base) ? base : '/');
+}
+
+function authModeFromPath(pathname) {
+  return normalizePath(pathname) === '/signup' ? 'signup' : 'login';
+}
+
+function setPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
   if (pageId === 'landing' || pageId === 'how') lastPublicPage = pageId;
   window.scrollTo(0, 0);
+}
+
+function updateAuthPage(mode) {
+  const isSignup = mode === 'signup';
+  const shell = document.getElementById('auth-shell');
+  if (shell) shell.setAttribute('data-auth-mode', isSignup ? 'signup' : 'login');
+  document.getElementById('auth-login').style.display = isSignup ? 'none' : '';
+  document.getElementById('auth-register').style.display = isSignup ? '' : 'none';
+  document.getElementById('auth-side-login').style.display = isSignup ? 'none' : '';
+  document.getElementById('auth-side-signup').style.display = isSignup ? '' : 'none';
+}
+
+function renderRoute(rawPath, { replace = false } = {}) {
+  const path = normalizePath(rawPath || window.location.pathname);
+  let finalPath = path;
+
+  if (path === '/app' && !currentUser) {
+    finalPath = '/login';
+  } else if (path === '/admin' && !currentUser) {
+    finalPath = '/login';
+  } else if (path === '/admin' && currentUser && !currentUser.isAdmin) {
+    finalPath = '/app';
+  } else if ((path === '/login' || path === '/signup') && currentUser) {
+    finalPath = '/app';
+  }
+
+  if (finalPath === '/' || finalPath === '/how') {
+    lastPublicPath = finalPath;
+    lastPublicPage = finalPath === '/how' ? 'how' : 'landing';
+  }
+
+  const targetPage = finalPath === '/how'
+    ? 'how'
+    : finalPath === '/login' || finalPath === '/signup'
+      ? 'auth'
+      : finalPath === '/admin'
+        ? 'admin'
+        : finalPath === '/app'
+          ? 'app'
+          : 'landing';
+
+  setPage(targetPage);
+
+  if (targetPage === 'auth') {
+    updateAuthPage(authModeFromPath(finalPath));
+  } else if (targetPage === 'admin') {
+    loadAdminReports();
+  } else if (targetPage === 'app') {
+    renderSidebar();
+    renderMyProfile();
+    updateVerificationBanner();
+    updateAdminVisibility();
+    showSection(currentSection || 'dashboard');
+  }
+
+  if (window.location.pathname !== finalPath) {
+    const method = replace ? 'replaceState' : 'pushState';
+    window.history[method]({}, '', finalPath);
+  }
+}
+
+function goTo(pageId, opts = {}) {
+  const targetPath = PAGE_PATHS[pageId] || '/';
+  renderRoute(targetPath, opts);
 }
 
 function showSection(id) {
@@ -1374,21 +1595,13 @@ function goBack() {
 
 // ── Auth page ─────────────────────────────────────────
 function openAuth(tab) {
-  goTo('auth');
-  switchAuth(tab);
+  renderRoute(tab === 'register' ? '/signup' : '/login');
 }
 function closeAuth() { goTo(lastPublicPage || 'landing'); }
-function switchAuth(tab) {
-  document.getElementById('auth-login').style.display   = tab === 'login'    ? '' : 'none';
-  document.getElementById('auth-register').style.display = tab === 'register' ? '' : 'none';
-  document.getElementById('auth-tab-login')?.classList.toggle('active', tab === 'login');
-  document.getElementById('auth-tab-register')?.classList.toggle('active', tab === 'register');
-}
 
 function goToAdmin() {
   if (!currentUser?.isAdmin) return toast('Admin access required');
-  goTo('admin');
-  loadAdminReports();
+  renderRoute('/admin');
 }
 
 // ── City autocomplete (OpenStreetMap Nominatim — no API key needed) ──────
@@ -1655,7 +1868,7 @@ async function doLogin() {
 
 // ── After login ───────────────────────────────────────
 async function afterLogin() {
-  goTo('app');
+  renderRoute('/app', { replace: true });
   renderSidebar();
   renderMyProfile();
   updateVerificationBanner();
@@ -1676,23 +1889,37 @@ async function doLogout(silent = false) {
   token = null; currentUser = null;
   blockedUserIds = new Set();
   if (wsSocket) { wsSocket.disconnect(); wsSocket = null; }
-  goTo('landing');
+  renderRoute('/', { replace: true });
   if (!silent) toast('Signed out');
 }
 
 // ── Auto-login on page load ───────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   await handleAuthActionsFromUrl();
+  const initialPath = normalizePath(window.location.pathname);
+  const requiresAuthCheck = initialPath === '/app' || initialPath === '/admin';
+  if (!requiresAuthCheck) {
+    renderRoute(initialPath, { replace: true });
+  } else {
+    setLoading(true);
+  }
   try {
     const data = await api('GET', '/api/auth/me');
     if (data) {
       currentUser = data.user;
       token = null;
-      afterLogin();
+      await loadBlockedUsers();
     }
   } catch {
     token = null;
+  } finally {
+    if (requiresAuthCheck) setLoading(false);
   }
+  renderRoute(window.location.pathname, { replace: true });
+});
+
+window.addEventListener('popstate', () => {
+  renderRoute(window.location.pathname, { replace: true });
 });
 
 // ── Sidebar ───────────────────────────────────────────
