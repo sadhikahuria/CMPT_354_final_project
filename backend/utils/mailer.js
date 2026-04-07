@@ -16,6 +16,22 @@ const transporter = (process.env.SMTP_HOST && process.env.SMTP_USER && process.e
     })
   : null;
 
+function requireTransport() {
+  if (!transporter) {
+    const missing = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM']
+      .filter(key => !process.env[key]);
+    throw new Error(
+      missing.length
+        ? `SMTP not configured: missing ${missing.join(', ')}`
+        : 'SMTP transport unavailable'
+    );
+  }
+  if (!process.env.EMAIL_FROM) {
+    throw new Error('SMTP not configured: missing EMAIL_FROM');
+  }
+  return transporter;
+}
+
 const GOLD = '#C9A84C';
 
 function baseTemplate(title, bodyHtml) {
@@ -36,8 +52,7 @@ function baseTemplate(title, bodyHtml) {
 }
 
 async function sendLikeNotification(toEmail, toName, fromName) {
-  if (!transporter) return;
-  await transporter.sendMail({
+  await requireTransport().sendMail({
     from: process.env.EMAIL_FROM,
     to: toEmail,
     subject: `${fromName} liked your profile ✦`,
@@ -54,8 +69,7 @@ async function sendLikeNotification(toEmail, toName, fromName) {
 }
 
 async function sendMatchNotification(toEmail, toName, matchName, score) {
-  if (!transporter) return;
-  await transporter.sendMail({
+  await requireTransport().sendMail({
     from: process.env.EMAIL_FROM,
     to: toEmail,
     subject: `It's a match! You & ${matchName} scored ${score}/36 ✦`,
@@ -76,8 +90,7 @@ async function sendMatchNotification(toEmail, toName, matchName, score) {
 }
 
 async function sendCompatRequestNotification(toEmail, toName, fromName) {
-  if (!transporter) return;
-  await transporter.sendMail({
+  await requireTransport().sendMail({
     from: process.env.EMAIL_FROM,
     to: toEmail,
     subject: `${fromName} wants to check your compatibility ✦`,
@@ -95,8 +108,7 @@ async function sendCompatRequestNotification(toEmail, toName, fromName) {
 }
 
 async function sendVerificationEmail(toEmail, toName, verifyUrl) {
-  if (!transporter) return;
-  await transporter.sendMail({
+  await requireTransport().sendMail({
     from: process.env.EMAIL_FROM,
     to: toEmail,
     subject: 'Verify your Ashtakoota account',
@@ -112,8 +124,7 @@ async function sendVerificationEmail(toEmail, toName, verifyUrl) {
 }
 
 async function sendPasswordResetEmail(toEmail, toName, resetUrl) {
-  if (!transporter) return;
-  await transporter.sendMail({
+  await requireTransport().sendMail({
     from: process.env.EMAIL_FROM,
     to: toEmail,
     subject: 'Reset your Ashtakoota password',

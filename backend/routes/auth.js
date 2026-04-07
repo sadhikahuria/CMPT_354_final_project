@@ -146,13 +146,11 @@ async function issueVerificationForUser(userId, email, username) {
      WHERE UserID = ?`,
     [tokenHash, userId]
   );
-  try {
-    await mailer.sendVerificationEmail(
-      email,
-      username,
-      `${frontendUrl()}/?verify=${encodeURIComponent(token)}`
-    );
-  } catch {}
+  await mailer.sendVerificationEmail(
+    email,
+    username,
+    `${frontendUrl()}/?verify=${encodeURIComponent(token)}`
+  );
 }
 
 async function issuePasswordResetForUser(userId, email, username) {
@@ -164,13 +162,11 @@ async function issuePasswordResetForUser(userId, email, username) {
      WHERE UserID = ?`,
     [tokenHash, userId]
   );
-  try {
-    await mailer.sendPasswordResetEmail(
-      email,
-      username,
-      `${frontendUrl()}/?reset=${encodeURIComponent(token)}`
-    );
-  } catch {}
+  await mailer.sendPasswordResetEmail(
+    email,
+    username,
+    `${frontendUrl()}/?reset=${encodeURIComponent(token)}`
+  );
 }
 
 // ── POST /api/auth/register ───────────────────────────────────────────────
