@@ -1,14 +1,22 @@
 // utils/mailer.js — Email notifications via Nodemailer
 const nodemailer = require('nodemailer');
 
+const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+const smtpSecure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true'
+  || smtpPort === 465;
+
 const transporter = (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
   ? nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 8000,
+      port: smtpPort,
+      secure: smtpSecure,
+      requireTLS: !smtpSecure,
+      connectionTimeout: parseInt(process.env.SMTP_CONNECTION_TIMEOUT_MS || '20000', 10),
+      greetingTimeout: parseInt(process.env.SMTP_GREETING_TIMEOUT_MS || '15000', 10),
+      socketTimeout: parseInt(process.env.SMTP_SOCKET_TIMEOUT_MS || '30000', 10),
+      tls: {
+        servername: process.env.SMTP_HOST,
+      },
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
