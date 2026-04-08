@@ -21,5 +21,9 @@ assert(html.includes("['localhost', '127.0.0.1'].includes(window.location.hostna
 assert(html.includes('function parseNotificationPayload(payload)'), 'notification payload parsing should be defensive');
 assert(scriptMatch[1].includes("api('GET', '/api/compatibility/history')"), 'dashboard should use the supported compatibility history endpoint');
 assert(!scriptMatch[1].includes('/api/compatibility/${currentUser.id}/history'), 'dashboard should not call a non-existent per-user history route');
+assert(ids.has('sec-insights'), 'insights section should exist');
+assert(scriptMatch[1].includes("api('GET', '/api/insights/overview')"), 'insights should load the overview endpoint');
+assert(scriptMatch[1].includes("api('GET', '/api/insights/query-lab')"), 'insights should load the query-lab endpoint');
+assert(html.includes('data-section="insights"'), 'insights navigation entry should exist');
 
 console.log('frontend smoke test passed');

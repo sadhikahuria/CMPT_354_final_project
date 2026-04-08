@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 const cors       = require('cors');
 const path       = require('path');
 const db         = require('./config/db');
+const { warmCompatibilityRules } = require('./utils/compatRules');
 
 const app    = express();
 const server = http.createServer(app);
@@ -166,6 +167,7 @@ app.use('/api/compatibility',   require('./routes/compatibility'));
 app.use('/api/chat',            require('./routes/chat'));
 app.use('/api/notifications',   require('./routes/notifications'));
 app.use('/api/safety',          require('./routes/safety'));
+app.use('/api/insights',        require('./routes/insights'));
 
 // ── Socket.io Chat ────────────────────────────────────────────────────────
 const { setupChat } = require('./routes/chat');
@@ -184,6 +186,7 @@ Promise.all([ensureSafetyTables(), ensureUserColumns(), ensureUserPhotoTable()])
     console.error('Failed to ensure safety tables:', err.message);
     process.exit(1);
   })
+  .then(() => warmCompatibilityRules())
   .then(() => {
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`✦ Ashtakoota server running on port ${PORT}`);

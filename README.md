@@ -10,17 +10,20 @@ ashtakoota/
 │   ├── server.js         Main entry point + Socket.io
 │   ├── config/
 │   │   ├── db.js         MySQL2 connection pool
-│   │   └── schema.sql    Full DB schema (run once on Railway MySQL)
+│   │   ├── schema.sql    Full DB schema + Part 3 rule tables
+│   │   └── submission_setup.sql  Submission bootstrap with demo data
 │   ├── routes/
 │   │   ├── auth.js       Register / Login / /me
 │   │   ├── users.js      Browse profiles, best matches
 │   │   ├── social.js     Likes, match creation, Koota auto-calc
 │   │   ├── compatRequests.js  Intentional reading request system
 │   │   ├── compatibility.js  Eval detail, score history, PDF cert
+│   │   ├── insights.js   Query lab + analytics endpoints
 │   │   ├── chat.js       REST + WebSocket real-time chat
 │   │   └── notifications.js  In-app notification feed
 │   ├── utils/
-│   │   ├── koota.js      Complete 8-Koota engine (pure math)
+│   │   ├── koota.js      8-Koota engine using DB-backed scoring rules
+│   │   ├── compatRules.js Compatibility rule loader with fallback cache
 │   │   ├── astrology.js  Prokerala API + local ephemeris fallback
 │   │   ├── pdfCert.js    Guna Milan PDF certificate generator
 │   │   └── mailer.js     Email notifications (Nodemailer)
@@ -36,7 +39,7 @@ ashtakoota/
 |---|---|
 | Auth | JWT (7-day tokens), bcrypt passwords |
 | Birth chart | Prokerala API → local ephemeris fallback |
-| 8 Kootas | Pure-math engine (Varna/Vashya/Tara/Yoni/GrahaMaitri/Gana/Bhakoot/Nadi) |
+| 8 Kootas | Hybrid engine with DB-backed rule tables + Node orchestration |
 | Likes + Matches | Mutual-like detection → auto Koota calc |
 | Compat requests | Intentional 48h-expiry request system |
 | Score history | All past readings per user |
@@ -45,6 +48,7 @@ ashtakoota/
 | Real-time chat | Socket.io WebSocket + REST fallback |
 | Notifications | In-app feed + email via Nodemailer |
 | Avatars | Multer file upload, served statically |
+| Insights | Live query lab for join, division, aggregation, group-by, delete, update demos |
 
 ---
 
@@ -121,6 +125,14 @@ railway connect mysql
 ```
 
 This creates all tables and seeds Planet, Rashi, Nakshatra data.
+
+For the Part 3 submission/demo dataset, run the bootstrap from inside `backend/config`:
+```bash
+cd backend/config
+mysql -u <user> -p <database> < submission_setup.sql
+```
+
+That script loads the schema plus demo users, matches, readings, messages, and notifications so the query lab has non-empty results.
 
 ---
 
@@ -241,6 +253,9 @@ POST   /api/chat/:matchId/messages  Send (REST fallback)
 
 GET    /api/notifications           Notification feed
 PATCH  /api/notifications/read-all  Mark all read
+
+GET    /api/insights/overview       Part 3 analytics overview
+GET    /api/insights/query-lab      Part 3 query demo result sets
 
 WS     /chat (Socket.io namespace)
   emit: join_match { matchId }

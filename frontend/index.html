@@ -534,6 +534,29 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 .verify-banner{display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(110,15,31,.14);border:.5px solid var(--border-strong);border-radius:12px;padding:14px 16px;margin-bottom:1.5rem;font-size:13px;color:var(--ink-mid);}
 .verify-banner.show{display:flex;}
 .verify-banner-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.insights-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:1.25rem;margin-bottom:1.5rem;}
+.insights-panel{background:linear-gradient(180deg, rgba(49,33,37,.96), rgba(28,19,22,.96));border:1px solid var(--border);border-radius:22px;padding:1.35rem;box-shadow:var(--shadow-card);}
+.insights-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.65rem;}
+.insights-copy{font-size:14px;line-height:1.8;color:var(--ink-soft);}
+.insight-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
+.insight-stat{padding:1rem;border-radius:18px;background:rgba(18,11,13,.62);border:1px solid rgba(213,154,133,.12);}
+.insight-stat-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.45rem;}
+.insight-stat-value{font-family:var(--font-display);font-size:34px;line-height:1;color:var(--ink);}
+.insight-stat-sub{font-size:12px;color:var(--ink-soft);margin-top:.4rem;line-height:1.6;}
+.query-lab{display:grid;gap:1rem;}
+.query-card{background:rgba(34,24,27,.94);border:1px solid var(--border);border-radius:20px;padding:1.2rem;box-shadow:var(--shadow-card);}
+.query-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.query-card-title{font-size:16px;font-weight:600;color:var(--ink);}
+.query-card-sub{font-size:12px;color:var(--ink-soft);margin-top:.25rem;}
+.query-sql{margin:.9rem 0 1rem;padding:.9rem 1rem;border-radius:16px;background:rgba(12,8,9,.9);border:1px solid rgba(213,154,133,.12);color:var(--rose-gold-soft);font-size:12px;line-height:1.7;white-space:pre-wrap;overflow:auto;}
+.query-table-wrap{overflow:auto;border:1px solid rgba(213,154,133,.1);border-radius:16px;}
+.query-table{width:100%;border-collapse:collapse;min-width:520px;background:rgba(18,11,13,.72);}
+.query-table th,.query-table td{padding:.75rem .8rem;text-align:left;border-bottom:1px solid rgba(213,154,133,.08);font-size:13px;vertical-align:top;}
+.query-table th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);background:rgba(49,33,37,.72);}
+.query-card-notes{display:grid;gap:.45rem;margin-top:.95rem;}
+.query-card-note{font-size:13px;color:var(--ink-soft);line-height:1.7;}
+.query-card-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem;}
+.query-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(110,15,31,.2);border:1px solid rgba(213,154,133,.14);font-size:12px;color:var(--ink-mid);}
 
 /* ── LOADING ── */
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border-strong);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
@@ -593,6 +616,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .cta-inner{flex-direction:column;align-items:flex-start;}
   .dash-grid{grid-template-columns:1fr;}
   .dash-row{grid-template-columns:1fr;}
+  .insights-hero{grid-template-columns:1fr;}
+  .insight-stat-grid{grid-template-columns:1fr;}
   .chat-layout{grid-template-columns:1fr;height:auto;min-height:420px;}
   .chat-list{display:none;}
   .main-content{padding:1rem 1rem 6rem;}
@@ -608,7 +633,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .detail-header{padding:1.3rem;gap:14px;}
   .detail-gallery-strip{gap:8px;}
   .detail-gallery-photo{width:58px;height:74px;border-radius:14px;}
-  .mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(18,11,13,.95);backdrop-filter:blur(14px);border-top:.5px solid var(--border-strong);}
+  .mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:grid;grid-template-columns:repeat(6,1fr);background:rgba(18,11,13,.95);backdrop-filter:blur(14px);border-top:.5px solid var(--border-strong);}
   .nav-utility-profile{display:none;}
 }
 @media(max-width:980px){
@@ -1240,6 +1265,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       <div class="sidebar-profile" id="sidebar-profile"></div>
       <div class="sidebar-menu">
         <button class="sidebar-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="sidebar-icon">✦</span> Overview</button>
+        <button class="sidebar-item" data-section="insights" onclick="showSection('insights')"><span class="sidebar-icon">▣</span> Insights</button>
         <button class="sidebar-item" data-section="browse" onclick="showSection('browse')"><span class="sidebar-icon">◎</span> Discover</button>
         <button class="sidebar-item" data-section="matches" onclick="showSection('matches')"><span class="sidebar-icon">♥</span> Worth It</button>
         <button class="sidebar-item" data-section="chat" onclick="showSection('chat')"><span class="sidebar-icon">✉</span> Love Letters</button>
@@ -1269,6 +1295,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
           <div class="stat-card"><div class="stat-num" id="stat-best">—</div><div class="stat-label">Best score /36</div></div>
         </div>
         <div class="section-shortcuts">
+          <button class="section-shortcut" onclick="showSection('insights')">Open Insights</button>
           <button class="section-shortcut" onclick="showSection('requests')">Open Requests</button>
           <button class="section-shortcut" onclick="showSection('history')">Open Receipts</button>
         </div>
@@ -1282,6 +1309,28 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
             <div id="best-matches-list"><div class="empty"><div class="spinner"></div></div></div>
           </div>
         </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div class="section" id="sec-insights">
+        <div class="section-header"><h2>Query Lab</h2><p>Live database-facing views for the Part 3 demo, without leaving the product.</p></div>
+        <div class="insights-hero">
+          <div class="insights-panel">
+            <div class="insights-kicker">Database-first upgrade</div>
+            <div class="section-title" style="font-size:34px;margin-bottom:.8rem;">Part 3 lives here now.</div>
+            <div class="insights-copy">This section surfaces the exact query categories your project needs to demonstrate: joins, division, aggregation, grouped aggregation, delete with cascade, and update operations. It also shows whether compatibility rules were loaded from the database or the fallback cache.</div>
+            <div class="query-card-actions" style="margin-top:1.1rem;">
+              <button class="btn-primary" onclick="loadInsights()">Refresh insights</button>
+              <button class="btn-ghost" onclick="showSection('history')">Open readings</button>
+              <button class="btn-ghost" onclick="showSection('my-profile')">Open profile updates</button>
+            </div>
+          </div>
+          <div class="insights-panel">
+            <div class="insights-kicker">Overview</div>
+            <div class="insight-stat-grid" id="insight-stat-grid"><div class="empty"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <div class="query-lab" id="query-lab"><div class="empty"><div class="spinner"></div></div></div>
       </div>
 
       <!-- BROWSE -->
@@ -1409,6 +1458,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   </div><!-- /app-layout -->
   <div class="mobile-nav">
     <button class="mobile-nav-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="mobile-nav-icon">✦</span><span>Overview</span></button>
+    <button class="mobile-nav-item" data-section="insights" onclick="showSection('insights')"><span class="mobile-nav-icon">▣</span><span>Insights</span></button>
     <button class="mobile-nav-item" data-section="browse" onclick="showSection('browse')"><span class="mobile-nav-icon">◎</span><span>Discover</span></button>
     <button class="mobile-nav-item" data-section="matches" onclick="showSection('matches')"><span class="mobile-nav-icon">♥</span><span>Worth It</span></button>
     <button class="mobile-nav-item" data-section="chat" onclick="showSection('chat')"><span class="mobile-nav-icon">✉</span><span>Love Letters</span></button>
@@ -1834,6 +1884,7 @@ function showSection(id) {
   });
   const labels = {
     dashboard: 'Overview',
+    insights: 'Insights',
     browse: 'Discover',
     matches: 'Worth It',
     chat: 'Love Letters',
@@ -1847,6 +1898,7 @@ function showSection(id) {
   if (context) context.textContent = labels[id] || 'Overview';
   // Load data for section
   if (id === 'dashboard') loadDashboard();
+  if (id === 'insights') loadInsights();
   if (id === 'browse') loadBrowse();
   if (id === 'matches') loadMatches();
   if (id === 'chat') loadChatList();
@@ -2250,6 +2302,104 @@ function resetBrowseFilters() {
     el.value = '';
   });
   loadBrowse();
+}
+
+function renderInsightTable(rows) {
+  if (!rows || !rows.length) {
+    return '<div class="query-card-sub">No rows available in the current dataset.</div>';
+  }
+  const columns = Object.keys(rows[0]);
+  return `
+    <div class="query-table-wrap">
+      <table class="query-table">
+        <thead><tr>${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${rows.map(row => `<tr>${columns.map(col => `<td>${escapeHtml(row[col] === null || row[col] === undefined ? 'NULL' : String(row[col]))}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderQueryCard(query) {
+  const notes = (query.notes || []).map(note => `<div class="query-card-note">${escapeHtml(note)}</div>`).join('');
+  const target = query.target ? `<div class="query-chip">Target: ${escapeHtml(Object.values(query.target).join(' | '))}</div>` : '';
+  return `
+    <div class="query-card">
+      <div class="query-card-head">
+        <div>
+          <div class="query-card-title">${escapeHtml(query.title)}</div>
+          <div class="query-card-sub">Live result set from the current backend dataset.</div>
+        </div>
+        ${target}
+      </div>
+      <pre class="query-sql">${escapeHtml(query.sql || '')}</pre>
+      ${renderInsightTable(query.rows || (query.target ? [query.target] : []))}
+      ${notes ? `<div class="query-card-notes">${notes}</div>` : ''}
+      <div class="query-card-actions">
+        ${query.title === 'Delete With Cascade Demo' && query.target?.EvalID && query.target?.MatchID ? `<button class="btn-primary" onclick="openCompat(${query.target.EvalID}, ${query.target.MatchID})">Open demo match</button>` : ''}
+        ${query.title === 'Update Operation Demo' ? `<button class="btn-ghost" onclick="toggleNotifPanel()">Open notifications</button><button class="btn-ghost" onclick="showSection('my-profile')">Open profile editor</button>` : ''}
+      </div>
+    </div>`;
+}
+
+async function loadInsights() {
+  const statGrid = document.getElementById('insight-stat-grid');
+  const lab = document.getElementById('query-lab');
+  if (!statGrid || !lab) return;
+  statGrid.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+  lab.innerHTML = '<div class="empty"><div class="spinner"></div></div>';
+  try {
+    const [overviewData, queryData] = await Promise.all([
+      api('GET', '/api/insights/overview'),
+      api('GET', '/api/insights/query-lab'),
+    ]);
+    const overview = overviewData?.overview || {};
+    statGrid.innerHTML = `
+      <div class="insight-stat">
+        <div class="insight-stat-label">Readings</div>
+        <div class="insight-stat-value">${escapeHtml(overview.totalReadings ?? '0')}</div>
+        <div class="insight-stat-sub">Average score ${escapeHtml(overview.averageCompatibilityScore ?? '0')}/36</div>
+      </div>
+      <div class="insight-stat">
+        <div class="insight-stat-label">Division Hits</div>
+        <div class="insight-stat-value">${escapeHtml(overview.divisionQualifiedUsers ?? '0')}</div>
+        <div class="insight-stat-sub">Users with completed readings across all three Gana partner types.</div>
+      </div>
+      <div class="insight-stat">
+        <div class="insight-stat-label">Top Pair</div>
+        <div class="insight-stat-value">${escapeHtml(overview.strongestPair?.TotalScore ?? overview.highestScore ?? '0')}</div>
+        <div class="insight-stat-sub">${overview.strongestPair ? `${escapeHtml(overview.strongestPair.UserOne)} + ${escapeHtml(overview.strongestPair.UserTwo)}` : 'No pair available yet.'}</div>
+      </div>
+      <div class="insight-stat">
+        <div class="insight-stat-label">Rule Source</div>
+        <div class="insight-stat-value" style="font-size:24px;">${escapeHtml(overview.ruleSource || 'unknown')}</div>
+        <div class="insight-stat-sub">${escapeHtml(overview.ruleError || `Loaded at ${overview.ruleLoadedAt || 'unknown time'}`)}</div>
+      </div>
+    `;
+    const queryLab = queryData?.queryLab || {};
+    const orderedCards = [
+      queryLab.joinQuery,
+      queryLab.divisionQuery,
+      queryLab.aggregationQuery,
+      queryLab.groupByAggregation,
+      queryLab.deleteCascadeDemo,
+      queryLab.updateOperationDemo,
+    ].filter(Boolean);
+    lab.innerHTML = orderedCards.map(renderQueryCard).join('');
+  } catch (e) {
+    lab.innerHTML = renderEmptyState({
+      icon: '▣',
+      title: 'Insights unavailable',
+      text: e.message || 'The query lab could not be loaded.',
+      ctaLabel: 'Retry',
+      ctaAction: 'loadInsights()',
+    });
+    statGrid.innerHTML = renderEmptyState({
+      icon: '▣',
+      title: 'Overview unavailable',
+      text: 'Refresh once the backend insights endpoints are available.',
+    });
+  }
 }
 
 // ── DASHBOARD ─────────────────────────────────────────
